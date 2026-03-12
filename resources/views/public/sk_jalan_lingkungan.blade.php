@@ -1,5 +1,5 @@
 @extends('public.layouts.app')
-@section('title', 'Kondisi Jalan Tahunan')
+@section('title', 'SK Jalan Lingkungan')
 
 @push('styles')
   <style>
@@ -25,7 +25,7 @@
     }
 
     .btn-download-pdf {
-      background-color: #dc3545;
+      background-color: #2563eb;
       color: white;
       border-radius: 5px;
       padding: 8px 16px;
@@ -37,10 +37,10 @@
     }
 
     .btn-download-pdf:hover {
-      background-color: #c82333;
+      background-color: #1e40af;
       color: white;
       transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
     }
   </style>
 @endpush
@@ -49,18 +49,16 @@
   <!-- ***** Spacer for Header ***** -->
   <div style="height: 100px; background: #f7f7f7;"></div>
 
-  <!-- ***** Laporan Kondisi Jalan Section Start ***** -->
-  <section class="section" id="laporan-tahunan" style="background: #f7f7f7; padding-top: 30px; min-height: 70vh;">
+  <!-- ***** SK Jalan Lingkungan Section Start ***** -->
+  <section class="section" id="sk-jalan-lingkungan" style="background: #f7f7f7; padding-top: 30px; min-height: 70vh;">
     <div class="container">
       <div class="row">
         <div class="col-lg-12">
           <div class="section-heading text-center" style="margin-bottom: 40px;">
-            <!-- <h6>Dokumen & Publikasi</h6> -->
-            <h2>Laporan Kondisi Jalan Tahunan</h2>
+            <h2>SK Jalan Lingkungan</h2>
             <p
               style="margin-top: 15px; font-size: 15px; color: #666; max-width: 800px; margin-left: auto; margin-right: auto;">
-              Arsip laporan rutin kondisi kerusakan dan kemantapan ruas jalan lingkungan Kabupaten Pemalang dari tahun ke
-              tahun. Anda dapat mengunduh dokumen versi PDF pada tabel di bawah.
+              Arsip Surat Keputusan (SK) penetapan ruas jalan lingkungan Kabupaten Pemalang. Anda dapat mengunduh dokumen versi PDF pada tabel di bawah.
             </p>
           </div>
         </div>
@@ -74,21 +72,21 @@
                 <thead>
                   <tr>
                     <th scope="col" style="width: 15%; text-align: center;">Tahun</th>
-                    <th scope="col" style="width: 60%;">Judul Dokumen Laporan</th>
+                    <th scope="col" style="width: 60%;">Judul SK</th>
                     <th scope="col" style="width: 25%; text-align: center;">Aksi Unduh</th>
                   </tr>
                 </thead>
                 <tbody>
-                  @forelse($reports as $report)
+                  @forelse($sk_items as $sk)
                     <tr>
                       <td style="text-align: center; font-size: 18px; font-weight: 700; color: #333;">
-                        {{ $report->year }}
+                        {{ $sk->year }}
                       </td>
                       <td style="font-size: 16px; font-weight: 500;">
-                        {{ $report->title }}
+                        {{ $sk->title }}
                       </td>
                       <td style="text-align: center;">
-                        <a href="{{ asset('storage/' . $report->file_path) }}" target="_blank" class="btn-download-pdf">
+                        <a href="{{ asset('storage/' . $sk->file_path) }}" target="_blank" class="btn-download-pdf">
                           <i class="fas fa-file-pdf" style="margin-right: 5px;"></i> Unduh PDF
                         </a>
                       </td>
@@ -97,7 +95,7 @@
                     <tr>
                       <td colspan="3" style="text-align: center; padding: 40px 0; color: #999;">
                         <i class="fas fa-folder-open fa-3x" style="margin-bottom: 15px; color: #ddd;"></i><br>
-                        Belum ada arsip dokumen laporan yang diunggah.
+                        Belum ada arsip SK yang diunggah.
                       </td>
                     </tr>
                   @endforelse
@@ -110,6 +108,6 @@
       </div>
     </div>
   </section>
-  <!-- ***** Laporan Kondisi Jalan Section End ***** -->
+  <!-- ***** SK Jalan Lingkungan Section End ***** -->
 
 @endsection

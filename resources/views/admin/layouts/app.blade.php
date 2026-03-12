@@ -45,6 +45,15 @@
                 <a href="{{ route('admin.reports.index') }}" class="nav-item {{ Request::is('admin/reports*') ? 'active' : '' }}" style="text-decoration: none; color: inherit;">
                     <i class="fas fa-file-pdf"></i><span>Laporan Tahunan</span>
                 </a>
+                <a href="{{ route('admin.sk-jalan-lingkungan.index') }}" class="nav-item {{ Request::is('admin/sk-jalan-lingkungan*') ? 'active' : '' }}" style="text-decoration: none; color: inherit;">
+                    <i class="fas fa-file-signature"></i><span>SK Jalan Lingkungan</span>
+                </a>
+                <a href="{{ route('admin.psu-submissions.index') }}" class="nav-item {{ Request::is('admin/psu-submissions*') ? 'active' : '' }}" style="text-decoration: none; color: inherit;">
+                    <i class="fas fa-hand-holding-heart"></i><span>Permohonan PSU</span>
+                </a>
+                <a href="{{ route('admin.psu-templates.index') }}" class="nav-item {{ Request::is('admin/psu-templates*') ? 'active' : '' }}" style="text-decoration: none; color: inherit;">
+                    <i class="fas fa-file-download"></i><span>Template Data Teknis</span>
+                </a>
 
                 <div class="nav-section-label">Lainnya</div>
                 <a class="nav-item" href="/" style="text-decoration: none;">

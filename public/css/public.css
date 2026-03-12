@@ -55,7 +55,7 @@ html { scroll-behavior: smooth; }
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg-dark);
-  color: var(--text-primary);
+  color: #281e1e;
   line-height: 1.6;
   overflow-x: hidden;
 }

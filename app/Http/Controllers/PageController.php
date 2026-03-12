@@ -21,4 +21,16 @@ class PageController extends Controller
         $reports = \App\Models\RoadConditionReport::orderBy('year', 'desc')->get();
         return view('public.kondisi_tahunan', compact('reports'));
     }
+
+    public function skJalanLingkungan()
+    {
+        $sk_items = \App\Models\SkJalanLingkungan::orderBy('year', 'desc')->get();
+        return view('public.sk_jalan_lingkungan', compact('sk_items'));
+    }
+
+    public function psuTemplates()
+    {
+        $templates = \App\Models\PsuTemplate::orderBy('created_at', 'desc')->get();
+        return view('public.psu_template', compact('templates'));
+    }
 }

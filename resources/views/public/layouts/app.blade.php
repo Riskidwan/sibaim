@@ -14,15 +14,18 @@
   <title>SIG Jalan - @yield('title', 'Beranda')</title>
 
   <!-- Additional CSS Files -->
-  <link rel="stylesheet" type="text/css" href="{{ asset('Template_Halaman/templatemo_543_breezed/assets/css/bootstrap.min.css') }}">
-  <link rel="stylesheet" type="text/css" href="{{ asset('Template_Halaman/templatemo_543_breezed/assets/css/font-awesome.css') }}">
-  <link rel="stylesheet" href="{{ asset('Template_Halaman/templatemo_543_breezed/assets/css/templatemo-breezed.css') }}">
+  <link rel="stylesheet" type="text/css"
+    href="{{ asset('Template_Halaman/templatemo_543_breezed/assets/css/bootstrap.min.css') }}">
+  <link rel="stylesheet" type="text/css"
+    href="{{ asset('Template_Halaman/templatemo_543_breezed/assets/css/font-awesome.css') }}">
+  <link rel="stylesheet"
+    href="{{ asset('Template_Halaman/templatemo_543_breezed/assets/css/templatemo-breezed.css') }}">
   <link rel="stylesheet" href="{{ asset('Template_Halaman/templatemo_543_breezed/assets/css/owl-carousel.css') }}">
   <link rel="stylesheet" href="{{ asset('Template_Halaman/templatemo_543_breezed/assets/css/lightbox.css') }}">
 
   <!-- Leaflet CSS (optional per page) -->
   @stack('styles')
-  
+
   <!-- Font Awesome 6 (for extra icons) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
@@ -42,7 +45,8 @@
               SIG JALAN
             </a>
             <ul class="nav">
-              <li class="scroll-to-section"><a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">Beranda</a></li>
+              <li class="scroll-to-section"><a href="{{ url('/') }}"
+                  class="{{ request()->is('/') ? 'active' : '' }}">Beranda</a></li>
               <li class="scroll-to-section"><a href="{{ url('/#about') }}">Profil</a></li>
               <li class="submenu custom-dropdown">
                 <a href="javascript:;" class="menu-data"><span>Program</span></a>
@@ -53,21 +57,26 @@
                 </ul>
               </li>
               <li class="submenu custom-dropdown">
-                <a href="javascript:;" class="menu-data text-dark"><span>Data</span></a>
+                <a href="javascript:;" class="menu-data"><span>Data</span></a>
                 <ul class="dropdown-menu">
                   <li class="submenu custom-dropdown-level-2">
                     <a href="javascript:;"><span>Jalan Lingkungan</span></a>
                     <ul class="dropdown-menu">
-                      <li><a href="/peta" class="{{ request()->is('peta') ? 'active' : '' }}"><span>Peta Jalan (WebGIS)</span></a></li>
-                      <li><a href="/kondisi-jalan-tahunan" class="{{ request()->is('kondisi-jalan-tahunan') ? 'active' : '' }}"><span>Kondisi Jalan Tahunan</span></a></li>
-                      <li><a href="/#download"><span>SK Jalan Lingkungan</span></a></li>
+                      <li><a href="/peta" class="{{ request()->is('peta') ? 'active' : '' }}"><span>Peta Jalan
+                            (WebGIS)</span></a></li>
+                      <li><a href="/kondisi-jalan-tahunan"
+                          class="{{ request()->is('kondisi-jalan-tahunan') ? 'active' : '' }}"><span>Kondisi Jalan
+                            Tahunan</span></a></li>
+                      <li><a href="/sk-jalan-lingkungan"
+                          class="{{ request()->is('sk-jalan-lingkungan') ? 'active' : '' }}"><span>SK Jalan Lingkungan</span></a></li>
                     </ul>
                   </li>
                   <li class="submenu custom-dropdown-level-2">
                     <a href="javascript:;"><span>Data PSU</span></a>
                     <ul class="dropdown-menu">
-                      <li><a href="/peta"><span>Permohonan Serah Terima PSU</span></a></li>
-                      <li><a href="/#statistik"><span>Template Data teknis</span></a></li>
+                      <li><a href="/permohonan-psu" class="{{ request()->is('permohonan-psu') ? 'active' : '' }}"><span>Permohonan Serah Terima PSU</span></a></li>
+                      <li><a href="/cek-status-psu" class="{{ request()->is('cek-status-psu') ? 'active' : '' }}"><span>Cek Status Permohonan</span></a></li>
+                      <li><a href="/template-data-teknis" class="{{ request()->is('template-data-teknis') ? 'active' : '' }}"><span>Template Data teknis</span></a></li>
                       <li><a href="/#download"><span>Statistik Perumahan</span></a></li>
                       <li><a href="/#download"><span>Data Serah Terima PSU</span></a></li>
                     </ul>
@@ -109,7 +118,8 @@
         <div class="col-lg-6 col-xs-12">
           <div class="copyright-text">
             <p>Copyright &copy; 2026 SIG Jalan Kabupaten Pemalang.
-              <br>Design modified from: TemplateMo</p>
+              <br>Design modified from: TemplateMo
+            </p>
           </div>
         </div>
         <div class="col-lg-6 col-xs-12">

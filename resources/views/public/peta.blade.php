@@ -11,8 +11,8 @@
       <div class="row">
         <div class="col-lg-12">
           <div class="section-heading text-center" style="margin-bottom: 30px;">
-            <h6>Peta Interaktif (WebGIS)</h6>
-            <h2>Sebaran Ruas Jalan Lingkungan</h2>
+            <!-- <h2>Peta Interaktif (WebGIS)</h2> -->
+            <h2>Peta Interaktif (WebGIS)</h2>
             <p style="margin-top: 15px; font-size: 15px; color: #666; max-width: 800px; margin-left: auto; margin-right: auto; line-height: 1.6;">
               Peta WebGIS ini merupakan visualisasi geografis khusus untuk memetakan jaringan jalan lingkungan di Kabupaten Pemalang. Peta ini dapat digunakan untuk melihat, memantau, dan menganalisis secara langsung informasi teknis tiap ruas jalan, kondisi tingkat kerusakan jalan secara rinci dan <i>real-time</i> berdasarkan pemetaan titik koordinat lokasi di lapangan.
             </p>
