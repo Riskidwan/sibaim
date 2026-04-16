@@ -1,233 +1,278 @@
 /**
- * public-app.js - Public Landing Page Logic (Breezed Template)
- * Handles: stats, map, table, filters, detail panel
+ * SIBAIM WebGIS Public Application Logic
+ * Featuring Multi-Theme Base Layers and Live Data Integration
  */
 
-// ── State ──
-var pubMap = null;
-var pubRoadLayers = {};
-var pubLayerGroup = null;
-var pubTablePage = 1;
-var PUB_PER_PAGE = 10;
+let pubMap;
+let roadLayer;
+let allRoads = [];
 
-// ── Init ──
-document.addEventListener('DOMContentLoaded', async function () {
-  await initData();
-  renderPubStats();
-  initPubMap();
-  initPubOuterSearch();
+document.addEventListener('DOMContentLoaded', function() {
+    initPubMap();
+    fetchRoadData();
 });
 
-// ── Statistics ──
-function renderPubStats() {
-  if (!document.getElementById('pub-stat-total')) return; // Guard for pages without stats section
-
-  var stats = getStatistics();
-
-  document.getElementById('pub-stat-total').textContent = stats.totalJalan;
-  document.getElementById('pub-stat-panjang').textContent = stats.totalPanjang.toFixed(1) + ' km';
-  document.getElementById('pub-stat-baik').textContent = stats.kondisiCount['Baik'] || 0;
-  document.getElementById('pub-stat-baik-km').textContent = (stats.kondisiPanjang['Baik'] || 0).toFixed(1) + ' km';
-  document.getElementById('pub-stat-sedang').textContent = stats.kondisiCount['Sedang'] || 0;
-  document.getElementById('pub-stat-sedang-km').textContent = (stats.kondisiPanjang['Sedang'] || 0).toFixed(1) + ' km';
-  document.getElementById('pub-stat-rusak-ringan').textContent = stats.kondisiCount['Rusak Ringan'] || 0;
-  document.getElementById('pub-stat-rusak-ringan-km').textContent = (stats.kondisiPanjang['Rusak Ringan'] || 0).toFixed(1) + ' km';
-  document.getElementById('pub-stat-rusak-berat').textContent = stats.kondisiCount['Rusak Berat'] || 0;
-  document.getElementById('pub-stat-rusak-berat-km').textContent = (stats.kondisiPanjang['Rusak Berat'] || 0).toFixed(1) + ' km';
-}
-
-// ── Maps ──
 function initPubMap() {
-  if (!document.getElementById('pub-map')) return; // Guard for pages without map
+    // 1. Initial Map Setup
+    pubMap = L.map('pub-map').setView([-6.8893, 109.3813], 12); // Center to Pemalang
 
-  pubMap = L.map('pub-map', { zoomControl: true }).setView([-0.02, 109.34], 13);
-
-  var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap contributors'
-  });
-
-  var satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    maxZoom: 19,
-    attribution: '&copy; Esri'
-  });
-
-  osmLayer.addTo(pubMap);
-
-  L.control.layers(
-    { 'Street Map': osmLayer, 'Satellite': satelliteLayer },
-    null,
-    { position: 'topright', collapsed: true }
-  ).addTo(pubMap);
-
-  renderPubRoads();
-
-  setTimeout(function () { pubMap.invalidateSize(); }, 500);
-
-  // Re-invalidate when map section scrolls into view
-  var mapSection = document.getElementById('peta');
-  if (window.IntersectionObserver) {
-    var obs = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting && pubMap) {
-          pubMap.invalidateSize();
-        }
-      });
-    }, { threshold: 0.1 });
-    obs.observe(mapSection);
-  }
-}
-
-function renderPubRoads() {
-  if (pubLayerGroup) pubMap.removeLayer(pubLayerGroup);
-  pubRoadLayers = {};
-  pubLayerGroup = L.layerGroup();
-
-  var roads = getRoads();
-
-  roads.forEach(function (road) {
-    if (road.coordinates && road.coordinates.length > 0) {
-      var markerPos = road.coordinates[0];
-      var roadColor = getKondisiColor(road.kondisi);
-
-      var customIcon = L.divIcon({
-        className: 'custom-map-marker-simple',
-        html: '<i class="fas fa-map-marker-alt" style="color: ' + roadColor + '; font-size: 32px; filter: drop-shadow(0px 3px 3px rgba(0,0,0,0.4));"></i>',
-        iconSize: [30, 42],
-        iconAnchor: [15, 42],
-        popupAnchor: [0, -35]
-      });
-
-      var marker = L.marker(markerPos, { icon: customIcon });
-
-      marker.bindTooltip(
-        '<strong>' + road.nama + '</strong><br>' + road.kondisi + ' • ' + road.panjang + ' km',
-        { direction: 'top', offset: [0, -35], className: 'road-tooltip' }
-      );
-
-      marker.on('click', function () {
-        pubOpenDetail(road.id);
-      });
-
-      pubRoadLayers[road.id] = marker;
-      pubLayerGroup.addLayer(marker);
-    }
-  });
-
-  pubLayerGroup.addTo(pubMap);
-}
-
-function initPubOuterSearch() {
-  var dataList = document.getElementById('pub-road-list');
-  if (!dataList) return;
-
-  var allRoads = getRoads();
-  var html = '';
-  
-  // Sort roads alphabetically
-  var sortedRoads = allRoads.slice().sort(function(a, b) {
-    return (a.nama || '').localeCompare(b.nama || '');
-  });
-  
-  sortedRoads.forEach(function(r) {
-    html += '<option value="' + r.nama + '">' + (r.kecamatan || '') + '</option>';
-  });
-  
-  dataList.innerHTML = html;
-}
-
-function pubGoToRoad(nama) {
-  if (!nama) return;
-  var searchStr = nama.trim().toLowerCase();
-  var allRoads = getRoads();
-  
-  // Try exact case-insensitive match
-  var road = allRoads.find(function(r) { 
-    return (r.nama || '').toLowerCase() === searchStr; 
-  });
-  
-  // If not found, try partial match
-  if (!road) {
-    road = allRoads.find(function(r) { 
-      return (r.nama || '').toLowerCase().indexOf(searchStr) > -1; 
+    // 2. Define Base Layers (Themes)
+    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap'
     });
-  }
 
-  if (road) {
-    // Just zoom map to road marker, without opening the detail panel
-    if (road.coordinates && road.coordinates.length > 0) {
-      var markerPos = road.coordinates[0];
-      pubMap.flyTo(markerPos, 16, { duration: 1.5 });
-      
-      // Highlight temporarily
-      if (pubRoadLayers[road.id]) {
-        var iconDiv = pubRoadLayers[road.id].getElement();
-        if (iconDiv) {
-          iconDiv.classList.add('marker-highlight-bounce');
-          setTimeout(function () {
-            iconDiv.classList.remove('marker-highlight-bounce');
-          }, 3000);
+    const googleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        attribution: 'Google Streets'
+    });
+
+    const googleSatellite = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        attribution: 'Google Satellite'
+    });
+
+    const googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        attribution: 'Google Hybrid'
+    });
+
+    const googleTerrain = L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        attribution: 'Google Terrain'
+    });
+
+    const esriWorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EBP, and the GIS User Community'
+    });
+
+    const esriWorldStreet = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+    });
+
+    const cartoVoyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
+        subdomains: 'abcd',
+        maxZoom: 20
+    });
+
+    const cartoDark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
+        subdomains: 'abcd',
+        maxZoom: 20
+    });
+
+    const stadiaSmooth = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
+        maxZoom: 20,
+        attribution: '&copy; Stadia Maps, &copy; OpenStreetMap'
+    });
+
+    // 3. Add Default Layer
+    osm.addTo(pubMap);
+
+    // 4. Layer Control
+    const baseMaps = {
+        "OpenStreetMap": osm,
+        "Google Streets": googleStreets,
+        "Google Satellite": googleSatellite,
+        "Google Hybrid": googleHybrid,
+        "Google Terrain": googleTerrain,
+        "Esri Imagery": esriWorldImagery,
+        "Esri Streets": esriWorldStreet,
+        "CartoDB Voyager": cartoVoyager,
+        "CartoDB Dark": cartoDark,
+        "Stadia Smooth": stadiaSmooth
+    };
+
+    const layerControl = L.control.layers(baseMaps, null, { collapsed: true }).addTo(pubMap);
+    const layerContainer = layerControl.getContainer();
+    
+    // 1. Matikan SEMUA event hover bawaan Leaflet (mouseover, mouseenter, pointerover)
+    ['mouseover', 'mouseenter', 'pointerover', 'mouseout', 'mouseleave', 'pointerout'].forEach(evt => {
+        L.DomEvent.off(layerContainer, evt);
+        // Tambahkan penghenti event pasif jika perlu
+        L.DomEvent.on(layerContainer, evt, L.DomEvent.stop);
+    });
+    
+    // 2. Klik ikon untuk Toggle (Buka/Tutup)
+    const toggleButton = layerContainer.querySelector('.leaflet-control-layers-toggle');
+    L.DomEvent.on(toggleButton, 'click', function(e) {
+        L.DomEvent.stop(e);
+        const isExpanded = layerContainer.classList.contains('leaflet-control-layers-expanded');
+        if (isExpanded) {
+            layerControl.collapse();
+        } else {
+            layerControl.expand();
         }
-      }
-    }
-  } else {
-    // If not found, reset map to center
-    pubMap.setView([-0.02, 109.34], 13);
-  }
+    });
+
+    // 3. Klik luar untuk tutup otomatis
+    L.DomEvent.on(document, 'click', function(e) {
+        if (!layerContainer.contains(e.target)) {
+            layerControl.collapse();
+        }
+    });
+    
+    // 4. Tutup otomatis setelah pilih tema
+    pubMap.on('baselayerchange', function() {
+        layerControl.collapse();
+    });
+
+    // Initial scale
+    L.control.scale().addTo(pubMap);
 }
 
-// ── Detail Panel ──
-function pubOpenDetail(roadId) {
-  var road = getRoadById(roadId);
-  if (!road) return;
-
-  document.getElementById('pub-detail-nama').textContent = road.nama;
-  document.getElementById('pub-detail-panjang').textContent = road.panjang + ' km';
-  document.getElementById('pub-detail-lebar').textContent = road.lebar + ' m';
-  document.getElementById('pub-detail-perkerasan').textContent = road.jenis_perkerasan;
-  document.getElementById('pub-detail-kondisi-text').textContent = road.kondisi;
-  document.getElementById('pub-detail-kecamatan').textContent = road.kecamatan;
-  document.getElementById('pub-detail-kelurahan').textContent = road.kelurahan || '-';
-
-  var badge = document.getElementById('pub-detail-kondisi');
-  badge.textContent = road.kondisi;
-  badge.className = 'kondisi-badge ' + getKondisiClass(road.kondisi);
-
-  document.getElementById('pub-detail-overlay').classList.add('show');
-
-  // Zoom map to road marker
-  if (road.coordinates && road.coordinates.length > 0) {
-    var markerPos = road.coordinates[0];
-    pubMap.flyTo(markerPos, 16, { duration: 1.5 });
-
-    // Highlight temporarily
-    if (pubRoadLayers[roadId]) {
-      var iconDiv = pubRoadLayers[roadId].getElement();
-      if (iconDiv) {
-        iconDiv.classList.add('marker-highlight-bounce');
-        setTimeout(function () {
-          iconDiv.classList.remove('marker-highlight-bounce');
-        }, 3000);
-      }
+async function fetchRoadData() {
+    try {
+        const response = await fetch('/api/roads');
+        const data = await response.json();
+        allRoads = data;
+        renderRoads(data);
+        populateSearchList(data);
+    } catch (error) {
+        console.error('Error fetching road data:', error);
     }
-  }
+}
+
+function renderRoads(roads) {
+    if (roadLayer) pubMap.removeLayer(roadLayer);
+    
+    roadLayer = L.featureGroup();
+
+    roads.forEach(road => {
+        const rawCoords = road.coordinates;
+
+        if (rawCoords && rawCoords.length > 0) {
+            // Robust coordinate handling: ensures we have [[lat, lng], ...]
+            let coords = Array.isArray(rawCoords[0]) ? rawCoords : [rawCoords];
+            
+            const color = getKondisiColor(road.kondisi);
+            const icon = getKondisiIcon(road.kondisi);
+            let layer;
+
+            if (coords.length === 1) {
+                // Point Marker
+                const iconHtml = `
+                    <div class="custom-map-marker">
+                        <div class="marker-pin" style="background: ${color}">
+                            <i class="fas ${icon}"></i>
+                        </div>
+                        <div class="marker-pulse"></div>
+                    </div>
+                `;
+                
+                const customIcon = L.divIcon({
+                    html: iconHtml,
+                    className: '',
+                    iconSize: [30, 42],
+                    iconAnchor: [15, 42]
+                });
+
+                layer = L.marker([coords[0][0], coords[0][1]], {
+                    icon: customIcon
+                });
+            } else {
+                // Line / Polyline
+                layer = L.polyline(coords, {
+                    color: color,
+                    weight: 5,
+                    opacity: 0.8
+                });
+            }
+
+            layer.on('click', () => {
+                pubShowDetail(road);
+            });
+
+            layer.addTo(roadLayer);
+        }
+    });
+
+    roadLayer.addTo(pubMap);
+}
+
+function getKondisiIcon(kondisi) {
+    switch(kondisi) {
+        case 'Baik': return 'fa-check';
+        case 'Sedang': return 'fa-info';
+        case 'Rusak Ringan': return 'fa-exclamation';
+        case 'Rusak Berat': return 'fa-exclamation-triangle';
+        default: return 'fa-road';
+    }
+}
+
+function getKondisiColor(kondisi) {
+    switch(kondisi) {
+        case 'Baik': return '#22c55e';
+        case 'Sedang': return '#eab308';
+        case 'Rusak Ringan': return '#f97316';
+        case 'Rusak Berat': return '#ef4444';
+        default: return '#64748b';
+    }
+}
+
+function populateSearchList(roads) {
+    const list = document.getElementById('pub-road-list');
+    if (!list) return;
+    list.innerHTML = '';
+    roads.forEach(road => {
+        const opt = document.createElement('option');
+        opt.value = road.nama;
+        list.appendChild(opt);
+    });
+}
+
+function pubGoToRoad(name) {
+    if (!name) return;
+    
+    // Case-insensitive search
+    const road = allRoads.find(r => r.nama.toLowerCase() === name.toLowerCase());
+    
+    if (road) {
+        const rawCoords = road.coordinates;
+        if (rawCoords && rawCoords.length > 0) {
+            // Robust check
+            const targetPos = Array.isArray(rawCoords[0]) ? rawCoords[0] : rawCoords;
+            pubMap.flyTo([targetPos[0], targetPos[1]], 16);
+            pubShowDetail(road);
+        }
+    }
+}
+
+// Add event listener for better search experience (datalist selection)
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('pub-road-search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            pubGoToRoad(this.value);
+        });
+    }
+});
+
+function pubShowDetail(road) {
+    document.getElementById('pub-detail-nama').innerText = road.nama;
+    document.getElementById('pub-detail-panjang').innerText = road.panjang + ' km';
+    document.getElementById('pub-detail-lebar').innerText = road.lebar + ' m';
+    document.getElementById('pub-detail-perkerasan').innerText = road.jenis_perkerasan || '-';
+    document.getElementById('pub-detail-kecamatan').innerText = road.kecamatan || '-';
+    document.getElementById('pub-detail-kelurahan').innerText = road.kelurahan || '-';
+    
+    const badge = document.getElementById('pub-detail-kondisi');
+    badge.innerText = road.kondisi;
+    badge.className = 'kondisi-badge ' + road.kondisi.toLowerCase().replace(' ', '-');
+    
+    document.getElementById('pub-detail-overlay').classList.add('active');
 }
 
 function pubCloseDetail() {
-  document.getElementById('pub-detail-overlay').classList.remove('show');
+    document.getElementById('pub-detail-overlay').classList.remove('active');
 }
 
-// Close on overlay click
-document.addEventListener('click', function (e) {
-  var overlay = document.getElementById('pub-detail-overlay');
-  if (e.target === overlay) {
-    pubCloseDetail();
-  }
-});
-
-// Close on Escape key
-document.addEventListener('keydown', function (e) {
-  if (e.key === 'Escape') pubCloseDetail();
-});
-
-
+// Global expose
+window.pubGoToRoad = pubGoToRoad;
+window.pubCloseDetail = pubCloseDetail;
+window.pubShowDetail = pubShowDetail;

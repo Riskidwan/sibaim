@@ -3,32 +3,59 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Road;
-use Illuminate\Support\Facades\DB;
+use App\Models\PsuSubmission;
+use App\Models\PsuHousing;
+use App\Models\DataJalan;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $totalJalan = Road::count();
-        $totalPanjang = Road::sum('panjang');
+        // PSU Stats
+        $psuTotalCount   = PsuSubmission::count();
+        $psuPendingCount = PsuSubmission::where('status', 'verifikasi dokumen')->count();
+        $housingCount    = PsuHousing::count();
+        $roadCount       = DataJalan::count();
 
-        $kondisiCount = Road::select('kondisi', DB::raw('count(*) as total'))
-            ->groupBy('kondisi')
-            ->pluck('total', 'kondisi')
-            ->toArray();
+        $recentPsu = PsuSubmission::latest()->take(5)->get();
 
-        $perkerasanCount = Road::select('jenis_perkerasan', DB::raw('count(*) as total'))
-            ->groupBy('jenis_perkerasan')
-            ->pluck('total', 'jenis_perkerasan')
-            ->toArray();
+        // Recent Activity from ActivityLog table
+        $recentActivity = \App\Models\ActivityLog::with('user')
+            ->latest()
+            ->take(6)
+            ->get()
+            ->map(function ($log) {
+                $modelNames = [
+                    'App\Models\PsuSubmission'  => 'Permohonan PSU',
+                    'App\Models\PsuHousing'     => 'Data Perumahan',
+                    'App\Models\PublicDownload'  => 'Pusat Unduhan',
+                    'App\Models\GaleriKegiatan'  => 'Galeri Kegiatan',
+                    'App\Models\User'            => 'Akun Pengguna',
+                    'App\Models\DataJalan'       => 'Data Jalan',
+                ];
 
-        // Default missing keys for UI
-        $kondisiCount = array_merge([
-            'Baik' => 0, 'Sedang' => 0, 'Rusak Ringan' => 0, 'Rusak Berat' => 0
-        ], $kondisiCount);
+                $modelName = $modelNames[$log->model_type] ?? 'Data Sistem';
 
-        return view('admin.dashboard.index', compact('totalJalan', 'totalPanjang', 'kondisiCount', 'perkerasanCount'));
+                $actions = [
+                    'created' => ['icon' => 'bi-plus-circle-fill', 'color' => 'success', 'label' => 'Menambah'],
+                    'updated' => ['icon' => 'bi-pencil-square',    'color' => 'primary',  'label' => 'Mengubah'],
+                    'deleted' => ['icon' => 'bi-trash3-fill',      'color' => 'danger',   'label' => 'Menghapus'],
+                ];
+
+                $action = $actions[$log->event] ?? ['icon' => 'bi-dot', 'color' => 'secondary', 'label' => 'Melakukan aksi di'];
+
+                return [
+                    'icon_class' => $action['icon'],
+                    'color'      => $action['color'],
+                    'title'      => $action['label'] . ' ' . $modelName,
+                    'user'       => $log->user ? $log->user->name : 'Sistem',
+                    'time'       => $log->created_at->diffForHumans(),
+                ];
+            });
+
+        return view('admin.dashboard.index', compact(
+            'psuTotalCount', 'psuPendingCount', 'housingCount', 'roadCount',
+            'recentPsu', 'recentActivity'
+        ));
     }
 }

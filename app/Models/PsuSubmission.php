@@ -4,8 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\LogsActivity;
+
 class PsuSubmission extends Model
 {
+    use LogsActivity;
     protected $fillable = [
         'no_registrasi',
         'nama_pemohon',
@@ -17,7 +20,19 @@ class PsuSubmission extends Model
         'siteplan',
         'daftar_psu_nilai',
         'fc_imb_pbg',
+        'file_template_diisi',
         'status',
-        'catatan_perbaikan'
+        'nomor_surat_ba',
+        'file_ba_terbit',
+        'catatan_perbaikan',
+        'user_id'
     ];
+
+    /**
+     * Get the user that owns the submission.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

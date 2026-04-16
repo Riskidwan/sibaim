@@ -72,6 +72,50 @@
 
         <div class="row justify-content-center">
             <div class="col-lg-10">
+                
+                <!-- TEMPLATE DOWNLOAD SECTION -->
+                @if(isset($templates) && $templates->count() > 0)
+                <div style="background: white; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); padding: 30px; margin-bottom: 30px; border-left: 4px solid #2563eb;">
+                    <h5 style="margin-bottom: 15px; color: #1e3c72; font-weight: 700;">
+                        <i class="fas fa-file-download" style="margin-right: 8px;"></i> Template Data Teknis (Unduh Dahulu)
+                    </h5>
+                    <p style="font-size: 0.9rem; color: #555; margin-bottom: 20px;">
+                        Silakan unduh template di bawah, isi sesuai data perumahan Anda, lalu unggah kembali pada form di bawah.
+                    </p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
+                        @foreach($templates as $template)
+                            @php
+                                $ext = pathinfo($template->file_path, PATHINFO_EXTENSION);
+                                $icon = 'fa-file';
+                                $color = '#6b7280';
+                                
+                                if (in_array($ext, ['pdf'])) {
+                                    $icon = 'fa-file-pdf';
+                                    $color = '#ef4444';
+                                } elseif (in_array($ext, ['doc', 'docx'])) {
+                                    $icon = 'fa-file-word';
+                                    $color = '#2563eb';
+                                } elseif (in_array($ext, ['xls', 'xlsx'])) {
+                                    $icon = 'fa-file-excel';
+                                    $color = '#10b981';
+                                } elseif (in_array($ext, ['zip', 'rar'])) {
+                                    $icon = 'fa-file-archive';
+                                    $color = '#f59e0b';
+                                }
+                            @endphp
+                            <a href="{{ asset('storage/' . $template->file_path) }}" target="_blank" style="display: flex; align-items: center; padding: 12px 15px; border: 1px solid #e1e5eb; border-radius: 8px; text-decoration: none; color: #333; transition: all 0.2s;">
+                                <i class="fas {{ $icon }}" style="font-size: 24px; color: {{ $color }}; margin-right: 15px;"></i>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">{{ $template->title }}</div>
+                                    <div style="font-size: 0.75rem; color: #6b7280;">{{ $template->description ?? 'Format Template' }}</div>
+                                </div>
+                                <i class="fas fa-download" style="color: #6b7280;"></i>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
                 <div class="form-section">
                     @if(session('success'))
                         <div class="alert alert-success" style="background-color: #ecfdf3; color: #027a48; border: 1px solid #a6f4c5;">
@@ -112,8 +156,10 @@
                             </div>
                         </div>
 
+                      
+
                         <h5 style="margin-bottom: 20px; margin-top: 20px; color: #2563eb; border-bottom: 2px solid #eef2ff; padding-bottom: 10px;">
-                            <i class="fas fa-file-upload"></i> Unggah Dokumen Teknis
+                            <i class="fas fa-file-pdf"></i> Unggah Dokumen Administrasi / Pendukung
                         </h5>
                         <div class="row">
                             <div class="col-md-6 form-group">
@@ -145,6 +191,11 @@
                                 <label class="form-label">FC IMB / PBG Perumahan <span style="color: red">*</span></label>
                                 <input type="file" name="fc_imb_pbg" class="form-control" accept=".pdf,.jpg,.jpeg,.png" required>
                                 <div class="upload-hint">Izin Mendirikan Bangunan (Maks 5MB)</div>
+                            </div>
+                            <div class="form-group mb-0">
+                                <label class="form-label">Unggah Template yang sudah Anda isi <span style="color: red">*</span></label>
+                                <input type="file" name="file_template_diisi" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.zip" required>
+                                <div class="upload-hint">Format Document/Excel/Zip (Maks 10MB)</div>
                             </div>
                         </div>
 

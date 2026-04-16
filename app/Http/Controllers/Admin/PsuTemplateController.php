@@ -43,6 +43,7 @@ class PsuTemplateController extends Controller
             'title' => $request->title,
             'description' => $request->description,
             'file_path' => $path,
+            'is_active' => $request->has('is_active'),
         ]);
 
         return redirect()->route('admin.psu-templates.index')->with('success', 'Template berhasil diunggah.');
@@ -68,6 +69,7 @@ class PsuTemplateController extends Controller
         ]);
 
         $data = $request->only(['title', 'description']);
+        $data['is_active'] = $request->has('is_active');
 
         if ($request->hasFile('file')) {
             // Delete old file

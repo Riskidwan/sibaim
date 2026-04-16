@@ -2,56 +2,83 @@
 @section('title', 'Manajemen Permohonan PSU')
 
 @section('content')
-<div class="road-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-    <h2 style="font-size: 1.5rem; margin: 0; color: #333;">Daftar Permohonan Serah Terima PSU</h2>
-</div>
-
-<div class="table-container">
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th style="width: 50px;">No</th>
-                <th>No Registrasi</th>
-                <th>Nama Pemohon</th>
-                <th>Tgl Masuk</th>
-                <th>Status</th>
-                <th style="width: 100px; text-align: center;">Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @php /** @var \Illuminate\Database\Eloquent\Collection $submissions */ @endphp
-            @forelse ($submissions as $index => $sub)
-                <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td style="font-weight: 600;">{{ $sub->no_registrasi }}</td>
-                    <td>{{ $sub->nama_pemohon }}</td>
-                    <td>{{ $sub->created_at->format('d M Y') }}</td>
-                    <td>
-                        @if($sub->status === 'verifikasi dokumen')
-                            <span class="badge" style="background-color: #fef0c7; color: #915d0a;">{{ $sub->status }}</span>
-                        @elseif($sub->status === 'perbaikan dokumen')
-                            <span class="badge" style="background-color: #fee4e2; color: #b42318;">{{ $sub->status }}</span>
-                        @else
-                            <span class="badge" style="background-color: #ecfdf3; color: #027a48;">{{ $sub->status }}</span>
-                        @endif
-                    </td>
-                    <td style="text-align: center;">
-                        <a href="{{ route('admin.psu-submissions.show', $sub->id) }}" class="btn-icon btn-secondary" title="Detail & Verifikasi" style="padding:4px 8px; border-radius:4px; text-decoration:none;">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="6" style="text-align: center; padding: 50px;">
-                        <div class="empty-state">
-                            <i class="fas fa-inbox" style="font-size: 2rem; color: #ccc;"></i>
-                            <p style="margin-top: 10px; color: #888;">Belum ada permohonan psu yang masuk.</p>
-                        </div>
-                    </td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title">Daftar Permohonan Serah Terima PSU</h5>
+        <p class="text-subtitle text-muted">Monitoring pengajuan Prasarana, Sarana, dan Utilitas</p>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">No</th>
+                        <th>No Registrasi</th>
+                        <th>Nama Pemohon</th>
+                        <th>Tgl Masuk</th>
+                        <th>Status</th>
+                        <th class="text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($submissions as $index => $sub)
+                        <tr>
+                            <td>{{ $index + 1 }}</td>
+                            <td class="text-bold-500">{{ $sub->no_registrasi }}</td>
+                            <td>{{ $sub->nama_pemohon }}</td>
+                            <td>
+                                <span class="text-muted small">
+                                    <i class="bi bi-calendar3 me-1"></i> {{ $sub->created_at->format('d M Y') }}
+                                </span>
+                            </td>
+                            <td>
+                                @php
+                                    $badgeColor = 'bg-secondary';
+                                    if($sub->status === 'verifikasi dokumen') $badgeColor = 'bg-info';
+                                    if($sub->status === 'perbaikan dokumen') $badgeColor = 'bg-warning';
+                                    if($sub->status === 'penugasan tim verifikasi') $badgeColor = 'bg-primary';
+                                    if($sub->status === 'BA terima terbit') $badgeColor = 'bg-success';
+                                    if($sub->status === 'terima') $badgeColor = 'bg-success';
+                                    if($sub->status === 'tolak') $badgeColor = 'bg-danger';
+                                @endphp
+                                <span class="badge {{ $badgeColor }}">{{ $sub->status }}</span>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <a href="{{ route('admin.psu-submissions.show', $sub->id) }}" class="btn btn-sm btn-outline-primary" title="Detail & Verifikasi">
+                                        <i class="bi bi-eye"></i> Detail
+                                    </a>
+                                    @if(!Auth::user()->isKepala())
+                                    <a href="{{ route('admin.psu-submissions.edit', $sub->id) }}" class="btn btn-sm btn-outline-warning" title="Edit Data">
+                                        <i class="bi bi-pencil-square"></i> Edit
+                                    </a>
+                                    @endif
+                                    @if(!Auth::user()->isKepala())
+                                    <form action="{{ route('admin.psu-submissions.destroy', $sub->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus permohonan ini? Semua berkas terkait juga akan dihapus.');" style="display:inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus">
+                                            <i class="bi bi-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center py-4">
+                                <div class="empty-state">
+                                    <div class="empty-icon text-muted mb-2"><i class="bi bi-envelope" style="font-size: 2rem;"></i></div>
+                                    <h6>Belum ada permohonan</h6>
+                                    <p class="text-muted small">Permohonan yang masuk akan muncul di sini</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 @endsection

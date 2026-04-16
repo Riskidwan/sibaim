@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dashboard Admin — SIJALAN</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --blue-deep:#07194a;--blue-mid:#0c2d80;--blue-main:#1251c5;--blue-light:#2e6ff5;
+  --blue-pale:#e8f0fe;--accent:#f0c040;--green:#22c55e;--orange:#f97316;--red:#ef4444;
+  --bg:#f0f4fc;--surface:#ffffff;--text:#0d1b3e;--muted:#7a8bb5;--border:#dce5f7;
+  --input-bg:#f7f9ff;--th-bg:#f0f4fc;--tr-hover:#e8f0fe;--topbar-bg:#ffffff;
+  --sidebar-w:260px;
+}
+html.dark{
+  --bg:#0d1117;--surface:#161b27;--text:#e2e8f6;--muted:#4a5a7e;--border:#232c42;
+  --blue-pale:#1a2540;--topbar-bg:#161b27;--input-bg:#0d1117;--th-bg:#0d1117;--tr-hover:#1a2336;
+}
+
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;transition:background .3s,color .3s}
+
+/* ══ SIDEBAR ══ */
+.sidebar{width:var(--sidebar-w);min-height:100vh;background:linear-gradient(180deg,var(--blue-deep) 0%,var(--blue-mid) 60%,#0e3490 100%);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100;overflow:hidden}
+.sidebar::before{content:'';position:absolute;width:320px;height:320px;border-radius:50%;border:1px solid rgba(255,255,255,.04);top:-120px;right:-120px;pointer-events:none}
+.sidebar::after{content:'';position:absolute;width:220px;height:220px;border-radius:50%;border:1px dashed rgba(240,192,64,.1);bottom:60px;left:-60px;pointer-events:none}
+.sidebar-logo{padding:24px 20px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.07);position:relative;z-index:1}
+.logo-icon-box{width:40px;height:40px;background:white;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.logo-icon-box svg{width:26px;height:26px}
+.sys-name{font-size:14px;font-weight:800;color:#fff;letter-spacing:-.01em}
+.sys-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:1px}
+.sidebar-nav{flex:1;padding:16px 14px;position:relative;z-index:1;overflow-y:auto}
+.nav-section-label{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.28);padding:0 10px;margin:18px 0 6px}
+.nav-section-label:first-child{margin-top:0}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;cursor:pointer;color:rgba(255,255,255,.52);font-size:13px;font-weight:500;transition:all .2s;margin-bottom:2px;border:none;background:transparent;width:100%;text-align:left}
+.nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9)}
+.nav-item.active{background:var(--blue-light);color:#fff;font-weight:700;box-shadow:0 4px 14px rgba(46,111,245,.4)}
+.nav-icon{width:17px;height:17px;flex-shrink:0;opacity:.8}
+.nav-item.active .nav-icon{opacity:1}
+.nav-badge{margin-left:auto;background:var(--accent);color:#0d1b3e;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px}
+.sidebar-bottom{padding:14px 14px 20px;border-top:1px solid rgba(255,255,255,.07);position:relative;z-index:1}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.06);cursor:pointer}
+.user-avatar{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--blue-light),var(--blue-main));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0}
+.user-name{font-size:12px;font-weight:700;color:#fff}
+.user-role{font-size:10.5px;color:rgba(255,255,255,.4);margin-top:1px}
+.logout-icon{margin-left:auto;color:rgba(255,255,255,.3)}
+
+/* ══ MAIN ══ */
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--topbar-bg);border-bottom:1px solid var(--border);padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;transition:background .3s,border-color .3s}
+.topbar-title{font-size:18px;font-weight:800;color:var(--text)}
+.topbar-bread{font-size:11.5px;color:var(--muted);margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.t-search{display:flex;align-items:center;gap:7px;background:var(--input-bg);border:1.5px solid var(--border);border-radius:9px;padding:7px 12px;width:200px;transition:border-color .2s,background .3s}
+.t-search:focus-within{border-color:var(--blue-light)}
+.t-search input{border:none;background:transparent;font-family:inherit;font-size:12.5px;color:var(--text);outline:none;width:100%}
+.t-search input::placeholder{color:var(--muted)}
+.t-btn{width:36px;height:36px;border:1.5px solid var(--border);border-radius:9px;background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);position:relative;transition:border-color .2s,background .3s}
+.t-btn:hover{border-color:var(--blue-light);color:var(--blue-main)}
+.notif-dot{position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--red);border:1.5px solid var(--surface)}
+.page-body{padding:24px 28px;flex:1}
+
+/* ══ PAGE VIEWS ══ */
+.page-view{display:none;animation:fadeUp .4s both}
+.page-view.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ CARDS & SURFACES ══ */
+.card{background:var(--surface);border-radius:16px;border:1px solid var(--border);overflow:hidden;transition:background .3s,border-color .3s}
+.card-header{padding:18px 22px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.card-title{font-size:14.5px;font-weight:800;color:var(--text)}
+.card-sub{font-size:11.5px;color:var(--muted);margin-top:2px}
+.card-body{padding:20px 22px}
+
+/* ══ STAT CARDS ══ */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+.stat-card{background:var(--surface);border-radius:16px;padding:20px;border:1px solid var(--border);position:relative;overflow:hidden;transition:box-shadow .2s,transform .2s,background .3s,border-color .3s}
+.stat-card:hover{box-shadow:0 8px 24px rgba(18,81,197,.1);transform:translateY(-2px)}
+.stat-card.blue{background:linear-gradient(135deg,var(--blue-mid) 0%,var(--blue-light) 100%);border-color:transparent}
+.stat-card.blue .stat-lbl,.stat-card.blue .stat-chg{color:rgba(255,255,255,.7)}
+.stat-card.blue .stat-val{color:#fff}
+.stat-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.stat-ico{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center}
+.stat-ico.bl{background:rgba(255,255,255,.15)}
+.stat-ico.gr{background:rgba(34,197,94,.12)}
+.stat-ico.or{background:rgba(249,115,22,.12)}
+.stat-ico.re{background:rgba(239,68,68,.1)}
+.stat-ico svg{width:19px;height:19px}
+.stat-ico.gr svg{color:var(--green)}.stat-ico.or svg{color:var(--orange)}.stat-ico.re svg{color:var(--red)}.stat-ico.bl svg{color:#fff}
+.stat-chg{font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;display:inline-flex;align-items:center;gap:3px}
+.stat-chg.up{background:rgba(34,197,94,.1);color:var(--green)}
+.stat-chg.dn{background:rgba(239,68,68,.1);color:var(--red)}
+.stat-chg.bl{background:rgba(255,255,255,.15);color:rgba(255,255,255,.85)}
+.stat-val{font-size:28px;font-weight:800;color:var(--text);line-height:1;margin-bottom:4px}
+.stat-lbl{font-size:12px;color:var(--muted);font-weight:500}
+
+/* ══ BUTTONS ══ */
+.btn{padding:8px 16px;border-radius:9px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;border:none;display:inline-flex;align-items:center;gap:7px}
+.btn-primary{background:var(--blue-main);color:#fff;box-shadow:0 4px 12px rgba(18,81,197,.25)}
+.btn-primary:hover{background:var(--blue-light)}
+.btn-outline{background:var(--surface);border:1.5px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--blue-light);color:var(--blue-main)}
+.btn-danger{background:var(--surface);border:1.5px solid #fecaca;color:var(--red)}
+.btn-danger:hover{background:#fef2f2}
+.btn-success{background:rgba(34,197,94,.1);border:1.5px solid rgba(34,197,94,.3);color:#16a34a}
+.btn-success:hover{background:rgba(34,197,94,.18)}
+.btn-sm{padding:6px 12px;font-size:12px;border-radius:8px}
+.btn-lg{padding:12px 24px;font-size:14.5px;border-radius:11px}
+
+/* ══ FORM ELEMENTS ══ */
+.form-grid{display:grid;gap:18px}
+.form-grid.cols-2{grid-template-columns:1fr 1fr}
+.form-grid.cols-3{grid-template-columns:1fr 1fr 1fr}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group.span-2{grid-column:span 2}
+.form-group.span-3{grid-column:span 3}
+label.lbl{font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+label.lbl span.req{color:var(--red);margin-left:2px}
+.form-control{width:100%;background:var(--input-bg);border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-family:inherit;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s,background .3s}
+.form-control:focus{border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(46,111,245,.12);background:var(--surface)}
+.form-control::placeholder{color:var(--muted);opacity:.6}
+select.form-control{cursor:pointer}
+textarea.form-control{resize:vertical;min-height:90px}
+.form-hint{font-size:11px;color:var(--muted);margin-top:2px}
+.form-section{margin-bottom:28px}
+.form-section-title{font-size:13px;font-weight:800;color:var(--text);padding-bottom:10px;border-bottom:2px solid var(--blue-pale);margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.form-section-title::before{content:'';width:4px;height:16px;background:var(--blue-main);border-radius:2px;flex-shrink:0}
+.form-actions{display:flex;gap:10px;justify-content:flex-end;padding-top:20px;border-top:1px solid var(--border);margin-top:4px}
+
+/* ══ TABLE ══ */
+.table-toolbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.table-search{display:flex;align-items:center;gap:7px;background:var(--input-bg);border:1.5px solid var(--border);border-radius:9px;padding:7px 12px;width:220px;transition:border-color .2s}
+.table-search:focus-within{border-color:var(--blue-light)}
+.table-search input{border:none;background:transparent;font-family:inherit;font-size:12.5px;color:var(--text);outline:none;width:100%}
+.table-search input::placeholder{color:var(--muted)}
+.table-actions{display:flex;gap:8px;align-items:center}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead th{text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:11px 18px;background:var(--th-bg);border-bottom:1px solid var(--border);transition:background .3s;white-space:nowrap}
+tbody td{padding:12px 18px;font-size:13px;color:var(--text);border-bottom:1px solid var(--border);transition:background .3s}
+tbody tr:last-child td{border:none}
+tbody tr:hover td{background:var(--tr-hover)}
+.td-bold{font-weight:700;color:var(--blue-main)}
+.td-num{font-weight:700;font-size:12.5px}
+.td-actions{display:flex;gap:6px}
+.tbl-pagination{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-top:1px solid var(--border);font-size:12.5px;color:var(--muted)}
+.page-btns{display:flex;gap:4px}
+.page-btn{width:30px;height:30px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.page-btn:hover,.page-btn.active{background:var(--blue-main);color:#fff;border-color:var(--blue-main)}
+
+/* ══ STATUS BADGES ══ */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.badge-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.badge.done{background:rgba(34,197,94,.1);color:#16a34a}
+.badge.pending{background:rgba(249,115,22,.1);color:#ea6f00}
+.badge.review{background:rgba(18,81,197,.1);color:var(--blue-main)}
+.badge.reject{background:rgba(239,68,68,.1);color:var(--red)}
+.badge.draft{background:rgba(100,116,139,.1);color:#64748b}
+
+/* ══ MODAL ══ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:20px;width:100%;max-width:660px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.25);animation:modalIn .3s cubic-bezier(.22,1,.36,1)}
+.modal.modal-lg{max-width:820px}
+@keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-header{padding:22px 24px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.modal-title{font-size:16px;font-weight:800;color:var(--text)}
+.modal-close{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .2s}
+.modal-close:hover{border-color:var(--red);color:var(--red)}
+.modal-body{padding:22px 24px}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end}
+
+/* ══ TABS ══ */
+.tab-bar{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:22px}
+.tab-item{padding:10px 18px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit}
+.tab-item.active{color:var(--blue-main);border-bottom-color:var(--blue-main)}
+.tab-item:hover{color:var(--text)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* ══ DETAIL ROWS ══ */
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.detail-row{display:contents}
+.detail-label{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:12px 0;border-bottom:1px solid var(--border)}
+.detail-value{font-size:13.5px;font-weight:600;color:var(--text);padding:12px 0;border-bottom:1px solid var(--border)}
+.detail-list{display:flex;flex-direction:column;gap:0}
+.detail-item{display:flex;justify-content:space-between;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--border);gap:12px}
+.detail-item:last-child{border:none}
+.detail-item .lbl{font-size:12px;font-weight:600;color:var(--muted);flex-shrink:0;min-width:160px}
+.detail-item .val{font-size:13px;font-weight:600;color:var(--text);text-align:right}
+
+/* ══ DASHBOARD CHARTS ══ */
+.mid-row{display:grid;grid-template-columns:1fr 320px;gap:18px;margin-bottom:20px}
+.chart-area{padding:18px 20px;height:210px;display:flex;align-items:flex-end;gap:8px}
+.bar-group{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
+.bar-wrap{width:100%;height:152px;display:flex;align-items:flex-end;gap:3px}
+.bar{flex:1;border-radius:5px 5px 0 0;transition:opacity .2s;cursor:pointer}
+.bar:hover{opacity:.75}
+.bar.b1{background:var(--blue-main)}.bar.b2{background:var(--blue-pale)}
+.bar-lbl{font-size:10.5px;color:var(--muted);font-weight:500}
+.chart-legend{display:flex;gap:14px;padding:0 20px 14px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);font-weight:500}
+.leg-dot{width:8px;height:8px;border-radius:2px}
+.ring-area{padding:20px;display:flex;flex-direction:column;align-items:center}
+.ring-wrap{position:relative;width:130px;height:130px;margin-bottom:16px}
+.ring-wrap svg{width:130px;height:130px;transform:rotate(-90deg)}
+.ring-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.ring-pct{font-size:24px;font-weight:800;color:var(--text)}
+.ring-sub{font-size:10px;color:var(--muted);font-weight:500}
+.ring-leg-item{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;width:100%}
+.ring-leg-item:last-child{border:none}
+.ring-leg-left{display:flex;align-items:center;gap:7px}
+.ring-dot{width:9px;height:9px;border-radius:3px}
+.ring-val{font-weight:700;font-size:12.5px}
+
+/* ══ BOTTOM ROW ══ */
+.bottom-row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.act-list{padding:4px 0}
+.act-item{display:flex;gap:12px;padding:11px 20px;transition:background .15s}
+.act-item:hover{background:var(--tr-hover)}
+.act-ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.act-ico.bl{background:rgba(18,81,197,.1)}.act-ico.gr{background:rgba(34,197,94,.1)}.act-ico.or{background:rgba(249,115,22,.1)}.act-ico.re{background:rgba(239,68,68,.1)}
+.act-title{font-size:12.5px;font-weight:600;color:var(--text);line-height:1.4}
+.act-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.act-time{font-size:11px;color:var(--muted);flex-shrink:0;padding-top:2px}
+
+/* ══ FILE UPLOAD ══ */
+.file-drop{border:2px dashed var(--border);border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s}
+.file-drop:hover{border-color:var(--blue-light);background:var(--blue-pale)}
+.file-drop-icon{font-size:28px;margin-bottom:8px}
+.file-drop-text{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
+.file-drop-sub{font-size:11.5px;color:var(--muted)}
+.file-list{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.file-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--input-bg);border-radius:9px;border:1px solid var(--border)}
+.file-item-name{flex:1;font-size:12.5px;font-weight:600;color:var(--text)}
+.file-item-size{font-size:11px;color:var(--muted)}
+
+/* ══ EMPTY STATE ══ */
+.empty-state{padding:52px 20px;text-align:center;color:var(--muted)}
+.empty-icon{font-size:40px;margin-bottom:12px;opacity:.5}
+.empty-text{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px}
+.empty-sub{font-size:12.5px}
+
+/* ══ ALERT ══ */
+.alert{padding:12px 16px;border-radius:10px;font-size:13px;font-weight:500;display:flex;align-items:flex-start;gap:10px;margin-bottom:16px}
+.alert.info{background:var(--blue-pale);border:1px solid rgba(18,81,197,.2);color:var(--blue-mid)}
+.alert.warn{background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.25);color:#c2560a}
+.alert.success{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);color:#166534}
+
+/* ══ TEMPLATE UPLOAD PAGE ══ */
+.tpl-dropzone{border:2px dashed var(--border);border-radius:14px;padding:40px 24px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;background:var(--input-bg)}
+.tpl-dropzone:hover,.tpl-dropzone.drag-over{border-color:var(--blue-light);background:var(--blue-pale)}
+.tpl-drop-icon{margin-bottom:12px;display:flex;justify-content:center}
+.tpl-drop-text{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px}
+.tpl-drop-sub{font-size:13px;color:var(--muted)}
+.tpl-drop-types{display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+.tpl-type-badge{padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;background:var(--surface);border:1.5px solid var(--border);color:var(--muted)}
+.tpl-preview-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--input-bg);border:1px solid var(--border);border-radius:9px;margin-bottom:8px}
+.tpl-preview-name{flex:1;font-size:13px;font-weight:600;color:var(--text)}
+.tpl-preview-size{font-size:11.5px;color:var(--muted)}
+.tpl-preview-prog{width:100%;height:5px;background:var(--border);border-radius:4px;margin-top:4px;overflow:hidden}
+.tpl-preview-bar{height:100%;background:var(--blue-main);border-radius:4px;transition:width .4s}
+.tpl-fmt{padding:2px 8px;border-radius:5px;font-size:10.5px;font-weight:800;letter-spacing:.04em}
+.tpl-fmt.pdf{background:rgba(239,68,68,.1);color:#b91c1c}
+.tpl-fmt.xlsx{background:rgba(34,197,94,.1);color:#166534}
+.tpl-fmt.docx{background:rgba(18,81,197,.1);color:#1251c5}
+.tpl-fmt.pptx{background:rgba(249,115,22,.1);color:#c2560a}
+
+/* ══ TOAST ══ */
+.toast-wrap{position:fixed;bottom:28px;right:28px;z-index:999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 18px;font-size:13px;font-weight:600;color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,.12);display:flex;align-items:center;gap:10px;pointer-events:all;animation:toastIn .35s cubic-bezier(.22,1,.36,1)}
+.toast.success{border-left:3px solid var(--green)}
+.toast.error{border-left:3px solid var(--red)}
+.toast.info{border-left:3px solid var(--blue-main)}
+@keyframes toastIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon-box">
+      <svg viewBox="0 0 26 26" fill="none">
+        <circle cx="13" cy="13" r="11" fill="#e8f0fe"/>
+        <path d="M13 4C13 4 8 8 7 12C6 15 6 16 6 16C6 16 8 14 10 14C10 14 8 18 9.5 21C11 24 12 25 13 26C14 25 15 24 16.5 21C18 18 16 14 16 14C18 14 20 16 20 16C20 16 20 15 19 12C18 8 13 4 13 4Z" fill="#1251c5"/>
+        <path d="M10 18L13 15L16 18" stroke="#07194a" stroke-width="1.2" stroke-linecap="round"/>
+        <circle cx="13" cy="9.5" r="1.5" fill="#f0c040"/>
+      </svg>
+    </div>
+    <div>
+      <div class="sys-name">SIJALAN</div>
+      <div class="sys-sub">Sistem Informasi Jalan</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Menu Utama</div>
+    <button class="nav-item active" onclick="showPage('dashboard',this)">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-item" onclick="showPage('data-jalan',this)">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+      Data Jalan
+      <span class="nav-badge">248</span>
+    </button>
+    <button class="nav-item" onclick="showPage('laporan',this)">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z"/></svg>
+      Laporan Tahunan
+    </button>
+    <div class="nav-section-label">Administrasi</div>
+    <button class="nav-item" onclick="showPage('sk-jalan',this)">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z"/></svg>
+      SK Jalan Lingkungan
+    </button>
+    <button class="nav-item" onclick="showPage('psu',this)">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+      Permohonan PSU
+      <span class="nav-badge">7</span>
+    </button>
+    <div class="nav-section-label">Referensi</div>
+    <button class="nav-item" onclick="showPage('template',this)">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Template Data Teknis
+    </button>
+    <div class="nav-section-label">Sistem</div>
+    <button class="nav-item" onclick="showPage('users',this)">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      Manajemen Pengguna
+    </button>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar">A</div>
+      <div>
+        <div class="user-name">Admin DPUTR</div>
+        <div class="user-role">Super Administrator</div>
+      </div>
+      <svg class="logout-icon" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════════ MAIN ═══════════ -->
+<div class="main">
+  <header class="topbar">
+    <div>
+      <div class="topbar-title" id="pageTitle">Dashboard</div>
+      <div class="topbar-bread" id="pageBread">Beranda / Dashboard Admin</div>
+    </div>
+    <div class="topbar-right">
+      <div class="t-search">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="color:var(--muted);flex-shrink:0"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" placeholder="Cari…"/>
+      </div>
+      <button class="t-btn" onclick="toggleTheme()" id="themeBtn" title="Ganti tema">🌙</button>
+      <div class="t-btn"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><div class="notif-dot"></div></div>
+      <div class="t-btn"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>
+    </div>
+  </header>
+
+  <div class="page-body">
+
+  <!-- ═══ PAGE: DASHBOARD ═══ -->
+  <div class="page-view active" id="page-dashboard">
+    <div class="stats-grid">
+      <div class="stat-card blue">
+        <div class="stat-top"><div class="stat-ico bl"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg></div><span class="stat-chg bl">▲ 12 baru</span></div>
+        <div class="stat-val">248 <span style="font-size:15px">km</span></div>
+        <div class="stat-lbl">Total Panjang Jalan</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-top"><div class="stat-ico gr"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><span class="stat-chg up">▲ 8%</span></div>
+        <div class="stat-val">182</div><div class="stat-lbl">Ruas Kondisi Baik</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-top"><div class="stat-ico or"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg></div><span class="stat-chg dn">▼ 3%</span></div>
+        <div class="stat-val">41</div><div class="stat-lbl">Perlu Perbaikan</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-top"><div class="stat-ico re"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg></div><span class="stat-chg dn">7 masuk</span></div>
+        <div class="stat-val">7</div><div class="stat-lbl">Permohonan PSU</div>
+      </div>
+    </div>
+    <div class="mid-row">
+      <div class="card">
+        <div class="card-header"><div><div class="card-title">Rekapitulasi Data Jalan per Kecamatan</div><div class="card-sub">Panjang jalan (km) — 2024</div></div><button class="btn btn-outline btn-sm">Ekspor</button></div>
+        <div class="chart-area">
+          <div class="bar-group"><div class="bar-wrap"><div class="bar b1" style="height:72%"></div><div class="bar b2" style="height:55%"></div></div><div class="bar-lbl">Kec. A</div></div>
+          <div class="bar-group"><div class="bar-wrap"><div class="bar b1" style="height:88%"></div><div class="bar b2" style="height:70%"></div></div><div class="bar-lbl">Kec. B</div></div>
+          <div class="bar-group"><div class="bar-wrap"><div class="bar b1" style="height:55%"></div><div class="bar b2" style="height:42%"></div></div><div class="bar-lbl">Kec. C</div></div>
+          <div class="bar-group"><div class="bar-wrap"><div class="bar b1" style="height:100%"></div><div class="bar b2" style="height:80%"></div></div><div class="bar-lbl">Kec. D</div></div>
+          <div class="bar-group"><div class="bar-wrap"><div class="bar b1" style="height:62%"></div><div class="bar b2" style="height:50%"></div></div><div class="bar-lbl">Kec. E</div></div>
+          <div class="bar-group"><div class="bar-wrap"><div class="bar b1" style="height:45%"></div><div class="bar b2" style="height:34%"></div></div><div class="bar-lbl">Kec. F</div></div>
+          <div class="bar-group"><div class="bar-wrap"><div class="bar b1" style="height:78%"></div><div class="bar b2" style="height:60%"></div></div><div class="bar-lbl">Kec. G</div></div>
+        </div>
+        <div class="chart-legend"><div class="leg-item"><div class="leg-dot" style="background:var(--blue-main)"></div>Jalan Lingkungan</div><div class="leg-item"><div class="leg-dot" style="background:var(--blue-pale)"></div>Jalan Kabupaten</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div><div class="card-title">Status Kondisi</div><div class="card-sub">Keseluruhan ruas</div></div></div>
+        <div class="ring-area">
+          <div class="ring-wrap">
+            <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="none" stroke="var(--blue-pale)" stroke-width="14"/><circle cx="60" cy="60" r="50" fill="none" stroke="#1251c5" stroke-width="14" stroke-dasharray="229 314" stroke-linecap="round"/><circle cx="60" cy="60" r="50" fill="none" stroke="#f97316" stroke-width="14" stroke-dasharray="53 314" stroke-dashoffset="-229" stroke-linecap="round"/><circle cx="60" cy="60" r="50" fill="none" stroke="#ef4444" stroke-width="14" stroke-dasharray="31 314" stroke-dashoffset="-282" stroke-linecap="round"/></svg>
+            <div class="ring-center"><div class="ring-pct">73%</div><div class="ring-sub">Baik</div></div>
+          </div>
+          <div style="width:100%">
+            <div class="ring-leg-item"><div class="ring-leg-left"><div class="ring-dot" style="background:#1251c5"></div><span style="font-size:12px">Baik</span></div><span class="ring-val" style="color:#1251c5">182 ruas</span></div>
+            <div class="ring-leg-item"><div class="ring-leg-left"><div class="ring-dot" style="background:var(--orange)"></div><span style="font-size:12px">Sedang</span></div><span class="ring-val" style="color:var(--orange)">41 ruas</span></div>
+            <div class="ring-leg-item"><div class="ring-leg-left"><div class="ring-dot" style="background:var(--red)"></div><span style="font-size:12px">Rusak</span></div><span class="ring-val" style="color:var(--red)">25 ruas</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-row">
+      <div class="card">
+        <div class="card-header"><div><div class="card-title">Permohonan PSU Terbaru</div><div class="card-sub">Daftar pengajuan prasarana</div></div><button class="btn btn-primary btn-sm" onclick="openModal('modal-form-psu')">+ Tambah</button></div>
+        <table><thead><tr><th>No. Permohonan</th><th>Nama Jalan</th><th>Kecamatan</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td class="td-bold">#PSU-2024-001</td><td>Jl. Mawar Indah</td><td>Kec. Tengah</td><td><span class="badge review"><span class="badge-dot"></span>Review</span></td></tr>
+          <tr><td class="td-bold">#PSU-2024-002</td><td>Jl. Melati Raya</td><td>Kec. Utara</td><td><span class="badge done"><span class="badge-dot"></span>Disetujui</span></td></tr>
+          <tr><td class="td-bold">#PSU-2024-003</td><td>Jl. Kenanga II</td><td>Kec. Selatan</td><td><span class="badge pending"><span class="badge-dot"></span>Menunggu</span></td></tr>
+          <tr><td class="td-bold">#PSU-2024-004</td><td>Jl. Flamboyan</td><td>Kec. Barat</td><td><span class="badge reject"><span class="badge-dot"></span>Ditolak</span></td></tr>
+          <tr><td class="td-bold">#PSU-2024-005</td><td>Jl. Anggrek III</td><td>Kec. Timur</td><td><span class="badge pending"><span class="badge-dot"></span>Menunggu</span></td></tr>
+        </tbody></table>
+      </div>
+      <div class="card">
+        <div class="card-header"><div><div class="card-title">Aktivitas Terbaru</div><div class="card-sub">Log perubahan sistem</div></div><button class="btn btn-outline btn-sm">Lihat Semua</button></div>
+        <div class="act-list">
+          <div class="act-item"><div class="act-ico bl">📋</div><div style="flex:1"><div class="act-title">SK Jalan Lingkungan diterbitkan</div><div class="act-meta">Jl. Melati Raya — oleh Admin DPUTR</div></div><div class="act-time">09:14</div></div>
+          <div class="act-item"><div class="act-ico gr">✅</div><div style="flex:1"><div class="act-title">Permohonan PSU #002 disetujui</div><div class="act-meta">Kec. Utara — Kepala Dinas</div></div><div class="act-time">08:50</div></div>
+          <div class="act-item"><div class="act-ico or">🗺️</div><div style="flex:1"><div class="act-title">Data teknis jalan diperbarui</div><div class="act-meta">Jl. Kenanga II — panjang 1,2 km</div></div><div class="act-time">08:22</div></div>
+          <div class="act-item"><div class="act-ico bl">📊</div><div style="flex:1"><div class="act-title">Laporan Tahunan 2024 diunggah</div><div class="act-meta">Format PDF — 3,4 MB</div></div><div class="act-time">Kemarin</div></div>
+          <div class="act-item"><div class="act-ico re">❌</div><div style="flex:1"><div class="act-title">Permohonan PSU #004 ditolak</div><div class="act-meta">Dokumen tidak lengkap</div></div><div class="act-time">Kemarin</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE: DATA JALAN ═══ -->
+  <div class="page-view" id="page-data-jalan">
+    <div class="card" style="margin-bottom:18px">
+      <div class="table-toolbar">
+        <div class="table-search">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="color:var(--muted);flex-shrink:0"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input type="text" placeholder="Cari nama jalan, kecamatan…"/>
+        </div>
+        <div class="table-actions">
+          <select class="form-control btn-sm" style="width:auto;padding:7px 12px">
+            <option>Semua Kecamatan</option><option>Kec. Tengah</option><option>Kec. Utara</option><option>Kec. Selatan</option>
+          </select>
+          <select class="form-control btn-sm" style="width:auto;padding:7px 12px">
+            <option>Semua Kondisi</option><option>Baik</option><option>Sedang</option><option>Rusak</option>
+          </select>
+          <button class="btn btn-outline btn-sm">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg> Ekspor
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="openModal('modal-form-jalan')">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4v16m8-8H4"/></svg> Tambah Data
+          </button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Nama Jalan</th><th>Kecamatan</th><th>Panjang (m)</th><th>Lebar (m)</th><th>Jenis Permukaan</th><th>Kondisi</th><th>Tahun Data</th><th>Aksi</th></tr></thead>
+          <tbody>
+            <tr><td class="td-num">001</td><td class="td-bold">Jl. Melati Raya</td><td>Kec. Utara</td><td>1.240</td><td>4,5</td><td>Aspal</td><td><span class="badge done">Baik</span></td><td>2024</td><td><div class="td-actions"><button class="btn btn-outline btn-sm" onclick="openModal('modal-detail-jalan')">Detail</button><button class="btn btn-primary btn-sm" onclick="openModal('modal-form-jalan')">Edit</button><button class="btn btn-danger btn-sm">Hapus</button></div></td></tr>
+            <tr><td class="td-num">002</td><td class="td-bold">Jl. Kenanga II</td><td>Kec. Selatan</td><td>870</td><td>3,0</td><td>Beton</td><td><span class="badge pending">Sedang</span></td><td>2024</td><td><div class="td-actions"><button class="btn btn-outline btn-sm" onclick="openModal('modal-detail-jalan')">Detail</button><button class="btn btn-primary btn-sm" onclick="openModal('modal-form-jalan')">Edit</button><button class="btn btn-danger btn-sm">Hapus</button></div></td></tr>
+            <tr><td class="td-num">003</td><td class="td-bold">Jl. Mawar Indah</td><td>Kec. Tengah</td><td>2.100</td><td>6,0</td><td>Aspal</td><td><span class="badge done">Baik</span></td><td>2024</td><td><div class="td-actions"><button class="btn btn-outline btn-sm" onclick="openModal('modal-detail-jalan')">Detail</button><button class="btn btn-primary btn-sm" onclick="openModal('modal-form-jalan')">Edit</button><button class="btn btn-danger btn-sm">Hapus</button></div></td></tr>
+            <tr><td class="td-num">004</td><td class="td-bold">Jl. Flamboyan</td><td>Kec. Barat</td><td>560</td><td>3,5</td><td>Tanah</td><td><span class="badge reject">Rusak</span></td><td>2024</td><td><div class="td-actions"><button class="btn btn-outline btn-sm" onclick="openModal('modal-detail-jalan')">Detail</button><button class="btn btn-primary btn-sm" onclick="openModal('modal-form-jalan')">Edit</button><button class="btn btn-danger btn-sm">Hapus</button></div></td></tr>
+            <tr><td class="td-num">005</td><td class="td-bold">Jl. Anggrek III</td><td>Kec. Timur</td><td>1.800</td><td>4,0</td><td>Paving</td><td><span class="badge pending">Sedang</span></td><td>2024</td><td><div class="td-actions"><button class="btn btn-outline btn-sm" onclick="openModal('modal-detail-jalan')">Detail</button><button class="btn btn-primary btn-sm" onclick="openModal('modal-form-jalan')">Edit</button><button class="btn btn-danger btn-sm">Hapus</button></div></td></tr>
+            <tr><td class="td-num">006</td><td class="td-bold">Jl. Dahlia Raya</td><td>Kec. Utara</td><td>990</td><td>5,0</td><td>Aspal</td><td><span class="badge done">Baik</span></td><td>2024</td><td><div class="td-actions"><button class="btn btn-outline btn-sm" onclick="openModal('modal-detail-jalan')">Detail</button><button class="btn btn-primary btn-sm" onclick="openModal('modal-form-jalan')">Edit</button><button class="btn btn-danger btn-sm">Hapus</button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tbl-pagination"><span>Menampilkan 1–6 dari 248 data</span><div class="page-btns"><button class="page-btn">‹</button><button class="page-btn active">1</button><button class="page-btn">2</button><button class="page-btn">3</button><button class="page-btn">…</button><button class="page-btn">42</button><button class="page-btn">›</button></div></div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE: LAPORAN TAHUNAN ═══ -->
+  <div class="page-view" id="page-laporan">
+    <div class="card">
+      <div class="card-header">
+        <div><div class="card-title">Daftar Laporan Tahunan</div><div class="card-sub">Arsip laporan kondisi jalan</div></div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('modal-form-laporan')">+ Upload Laporan</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>No</th><th>Tahun</th><th>Judul Laporan</th><th>Ukuran</th><th>Diunggah Oleh</th><th>Tanggal Upload</th><th>Aksi</th></tr></thead>
+          <tbody id="laporan-tbody">
+            <tr><td class="td-num">1</td><td class="td-bold">2024</td><td>Laporan Kondisi Jalan Kabupaten 2024</td><td>3,4 MB</td><td>Admin DPUTR</td><td>12 Jan 2025</td><td><div class="td-actions"><button class="btn btn-success btn-sm">⬇ Unduh</button><button class="btn btn-danger btn-sm" onclick="hapusLaporan(this,'Laporan 2024')">Hapus</button></div></td></tr>
+            <tr><td class="td-num">2</td><td class="td-bold">2023</td><td>Laporan Kondisi Jalan Kabupaten 2023</td><td>2,8 MB</td><td>Admin DPUTR</td><td>10 Jan 2024</td><td><div class="td-actions"><button class="btn btn-success btn-sm">⬇ Unduh</button><button class="btn btn-danger btn-sm" onclick="hapusLaporan(this,'Laporan 2023')">Hapus</button></div></td></tr>
+            <tr><td class="td-num">3</td><td class="td-bold">2022</td><td>Laporan Kondisi Jalan Kabupaten 2022</td><td>2,1 MB</td><td>Admin DPUTR</td><td>05 Feb 2023</td><td><div class="td-actions"><button class="btn btn-success btn-sm">⬇ Unduh</button><button class="btn btn-danger btn-sm" onclick="hapusLaporan(this,'Laporan 2022')">Hapus</button></div></td></tr>
+            <tr><td class="td-num">4</td><td class="td-bold">2021</td><td>Laporan Kondisi Jalan Kabupaten 2021</td><td>1,9 MB</td><td>Admin DPUTR</td><td>20 Jan 2022</td><td><div class="td-actions"><button class="btn btn-success btn-sm">⬇ Unduh</button><button class="btn btn-danger btn-sm" onclick="hapusLaporan(this,'Laporan 2021')">Hapus</button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tbl-pagination"><span id="laporan-count">Menampilkan 4 laporan</span><div></div></div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE: SK JALAN LINGKUNGAN ═══ -->
+  <div class="page-view" id="page-sk-jalan">
+    <div class="card">
+      <div class="table-toolbar">
+        <div class="table-search">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="color:var(--muted);flex-shrink:0"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input type="text" placeholder="Cari nomor SK, nama jalan…"/>
+        </div>
+        <div class="table-actions">
+          <button class="btn btn-outline btn-sm">⬇ Ekspor</button>
+          <button class="btn btn-primary btn-sm" onclick="openModal('modal-form-sk')">+ Buat SK Baru</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>No. SK</th><th>Nama Jalan</th><th>Kecamatan</th><th>Panjang (m)</th><th>Tanggal SK</th><th>Ditandatangani</th><th>Status</th><th>Aksi</th></tr></thead>
+          <tbody>
+            <tr><td class="td-bold">SK/001/2024</td><td>Jl. Melati Raya</td><td>Kec. Utara</td><td>1.240</td><td>15 Mar 2024</td><td>Kepala Dinas</td><td><span class="badge done">Aktif</span></td><td><div class="td-actions"><button class="btn btn-outline btn-sm" onclick="openModal('modal-detail-sk')">Detail</button><button class="btn btn-success btn-sm">⬇ PDF</button></div></td></tr>
+            <tr><td class="td-bold">SK/002/2024</td><td>Jl. Mawar Indah</td><td>Kec. Tengah</td><td>2.100</td><td>20 Apr 2024</td><td>Kepala Dinas</td><td><span class="badge done">Aktif</span></td><td><div class="td-actions"><button class="btn btn-outline btn-sm" onclick="openModal('modal-detail-sk')">Detail</button><button class="btn btn-success btn-sm">⬇ PDF</button></div></td></tr>
+            <tr><td class="td-bold">SK/003/2024</td><td>Jl. Anggrek III</td><td>Kec. Timur</td><td>1.800</td><td>10 Jun 2024</td><td>Kepala Dinas</td><td><span class="badge review">Draft</span></td><td><div class="td-actions"><button class="btn btn-outline btn-sm" onclick="openModal('modal-detail-sk')">Detail</button><button class="btn btn-primary btn-sm" onclick="openModal('modal-form-sk')">Edit</button></div></td></tr>
+            <tr><td class="td-bold">SK/004/2023</td><td>Jl. Kenanga II</td><td>Kec. Selatan</td><td>870</td><td>08 Sep 2023</td><td>Kepala Dinas</td><td><span class="badge done">Aktif</span></td><td><div class="td-actions"><button class="btn btn-outline btn-sm" onclick="openModal('modal-detail-sk')">Detail</button><button class="btn btn-success btn-sm">⬇ PDF</button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tbl-pagination"><span>Menampilkan 1–4 dari 38 SK</span><div class="page-btns"><button class="page-btn">‹</button><button class="page-btn active">1</button><button class="page-btn">2</button><button class="page-btn">3</button><button class="page-btn">›</button></div></div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE: PERMOHONAN PSU ═══ -->
+  <div class="page-view" id="page-psu">
+    <div class="alert info">ℹ️ Terdapat <strong>7 permohonan baru</strong> yang menunggu verifikasi dokumen.</div>
+    <div class="card">
+      <div class="table-toolbar">
+        <div class="table-search">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="color:var(--muted);flex-shrink:0"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input type="text" placeholder="Cari no. permohonan…"/>
+        </div>
+        <div class="table-actions">
+          <select class="form-control btn-sm" style="width:auto;padding:7px 12px"><option>Semua Status</option><option>Menunggu</option><option>Review</option><option>Disetujui</option><option>Ditolak</option></select>
+          <button class="btn btn-primary btn-sm" onclick="openModal('modal-form-psu')">+ Tambah Permohonan</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>No. Permohonan</th><th>Nama Pemohon</th><th>Nama Jalan</th><th>Kecamatan</th><th>Tanggal Masuk</th><th>Dokumen</th><th>Status</th><th>Aksi</th></tr></thead>
+          <tbody>
+            <tr><td class="td-bold">#PSU-2024-001</td><td>Budi Santoso</td><td>Jl. Mawar Indah</td><td>Kec. Tengah</td><td>10 Jan 2024</td><td><span class="badge done">Lengkap</span></td><td><span class="badge review"><span class="badge-dot"></span>Review</span></td><td><div class="td-actions"><button class="btn btn-outline btn-sm" onclick="openModal('modal-detail-psu')">Detail</button><button class="btn btn-success btn-sm">✓ Setuju</button><button class="btn btn-danger btn-sm">✗ Tolak</button></div></td></tr>
+            <tr><td class="td-bold">#PSU-2024-002</td><td>Siti Rahayu</td><td>Jl. Melati Raya</td><td>Kec. Utara</td><td>12 Jan 2024</td><td><span class="badge done">Lengkap</span></td><td><span class="badge done"><span class="badge-dot"></span>Disetujui</span></td><td><div class="td-actions"><button class="btn btn-outline btn-sm" onclick="openModal('modal-detail-psu')">Detail</button><button class="btn btn-success btn-sm">⬇ SK</button></div></td></tr>
+            <tr><td class="td-bold">#PSU-2024-003</td><td>Ahmad Fauzi</td><td>Jl. Kenanga II</td><td>Kec. Selatan</td><td>15 Jan 2024</td><td><span class="badge pending">Kurang</span></td><td><span class="badge pending"><span class="badge-dot"></span>Menunggu</span></td><td><div class="td-actions"><button class="btn btn-outline btn-sm" onclick="openModal('modal-detail-psu')">Detail</button><button class="btn btn-success btn-sm">✓ Setuju</button><button class="btn btn-danger btn-sm">✗ Tolak</button></div></td></tr>
+            <tr><td class="td-bold">#PSU-2024-004</td><td>Dewi Permata</td><td>Jl. Flamboyan</td><td>Kec. Barat</td><td>18 Jan 2024</td><td><span class="badge reject">Tidak Lengkap</span></td><td><span class="badge reject"><span class="badge-dot"></span>Ditolak</span></td><td><div class="td-actions"><button class="btn btn-outline btn-sm" onclick="openModal('modal-detail-psu')">Detail</button></div></td></tr>
+            <tr><td class="td-bold">#PSU-2024-005</td><td>Rudi Hermawan</td><td>Jl. Anggrek III</td><td>Kec. Timur</td><td>20 Jan 2024</td><td><span class="badge pending">Kurang</span></td><td><span class="badge pending"><span class="badge-dot"></span>Menunggu</span></td><td><div class="td-actions"><button class="btn btn-outline btn-sm" onclick="openModal('modal-detail-psu')">Detail</button><button class="btn btn-success btn-sm">✓ Setuju</button><button class="btn btn-danger btn-sm">✗ Tolak</button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tbl-pagination"><span>Menampilkan 1–5 dari 7 permohonan</span><div class="page-btns"><button class="page-btn">‹</button><button class="page-btn active">1</button><button class="page-btn">2</button><button class="page-btn">›</button></div></div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE: TEMPLATE DATA TEKNIS ═══ -->
+  <div class="page-view" id="page-template">
+
+    <!-- Upload area atas -->
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Upload Template Data Teknis</div>
+          <div class="card-sub">Kelola file template yang dapat diunduh oleh pengguna sistem</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('modal-upload-template')">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 4v16m8-8H4"/></svg>
+          Upload Template Baru
+        </button>
+      </div>
+
+      <!-- Drop zone besar -->
+      <div class="card-body">
+        <div class="tpl-dropzone" id="tplDropzone"
+          ondragover="event.preventDefault();this.classList.add('drag-over')"
+          ondragleave="this.classList.remove('drag-over')"
+          ondrop="handleTemplateDrop(event)"
+          onclick="document.getElementById('tpl-file-input').click()">
+          <input type="file" id="tpl-file-input" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" style="display:none" onchange="handleTemplateSelect(event)"/>
+          <div class="tpl-drop-icon">
+            <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="color:var(--blue-light)"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+          </div>
+          <div class="tpl-drop-text">Drag & drop file ke sini</div>
+          <div class="tpl-drop-sub">atau klik untuk memilih file</div>
+          <div class="tpl-drop-types">
+            <span class="tpl-type-badge">PDF</span>
+            <span class="tpl-type-badge">Word</span>
+            <span class="tpl-type-badge">Excel</span>
+            <span class="tpl-type-badge">PowerPoint</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:8px">Maksimal 20 MB per file</div>
+        </div>
+
+        <!-- Preview file yang dipilih sebelum upload -->
+        <div id="tpl-preview-list" style="display:none;margin-top:16px">
+          <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">File siap diupload</div>
+          <div id="tpl-preview-items"></div>
+          <div style="display:flex;gap:10px;margin-top:14px">
+            <button class="btn btn-outline btn-sm" onclick="clearPreview()">Batal</button>
+            <button class="btn btn-primary" onclick="simulateUpload()">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+              Upload Sekarang
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabel daftar template tersimpan -->
+    <div class="card">
+      <div class="table-toolbar">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="table-search">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="color:var(--muted);flex-shrink:0"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" placeholder="Cari nama template…" oninput="filterTemplate(this.value)"/>
+          </div>
+          <select class="form-control btn-sm" style="width:auto;padding:7px 12px" onchange="filterByKategori(this.value)">
+            <option value="">Semua Kategori</option>
+            <option>Form Data Jalan</option>
+            <option>SK & Administrasi</option>
+            <option>Laporan</option>
+            <option>Permohonan PSU</option>
+            <option>Teknis & Geometrik</option>
+          </select>
+        </div>
+        <div style="font-size:12.5px;color:var(--muted)" id="tpl-count">6 file template</div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="tpl-table">
+          <thead>
+            <tr>
+              <th>Nama Template</th>
+              <th>Kategori</th>
+              <th>Format</th>
+              <th>Ukuran</th>
+              <th>Diunggah Oleh</th>
+              <th>Tanggal Upload</th>
+              <th>Diunduh</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tpl-tbody">
+            <tr data-nama="Form Data Jalan" data-kat="Form Data Jalan">
+              <td><div style="display:flex;align-items:center;gap:9px"><span style="font-size:20px">📋</span><div><div style="font-weight:700;font-size:13px">Form Data Jalan</div><div style="font-size:11px;color:var(--muted)">Template isian data teknis ruas jalan</div></div></div></td>
+              <td><span class="badge review">Form Data Jalan</span></td>
+              <td><span class="tpl-fmt xlsx">XLSX</span></td>
+              <td>145 KB</td><td>Admin DPUTR</td><td>10 Jan 2025</td><td>34×</td>
+              <td><div class="td-actions">
+                <button class="btn btn-outline btn-sm" onclick="openModal('modal-edit-template')">Edit</button>
+                <button class="btn btn-success btn-sm">⬇ Unduh</button>
+                <button class="btn btn-danger btn-sm" onclick="confirmHapus(this)">Hapus</button>
+              </div></td>
+            </tr>
+            <tr data-nama="Rekapitulasi Kondisi Jalan" data-kat="Laporan">
+              <td><div style="display:flex;align-items:center;gap:9px"><span style="font-size:20px">📊</span><div><div style="font-weight:700;font-size:13px">Rekapitulasi Kondisi Jalan</div><div style="font-size:11px;color:var(--muted)">Rekap kondisi jalan per kecamatan</div></div></div></td>
+              <td><span class="badge done">Laporan</span></td>
+              <td><span class="tpl-fmt xlsx">XLSX</span></td>
+              <td>98 KB</td><td>Admin DPUTR</td><td>10 Jan 2025</td><td>21×</td>
+              <td><div class="td-actions">
+                <button class="btn btn-outline btn-sm" onclick="openModal('modal-edit-template')">Edit</button>
+                <button class="btn btn-success btn-sm">⬇ Unduh</button>
+                <button class="btn btn-danger btn-sm" onclick="confirmHapus(this)">Hapus</button>
+              </div></td>
+            </tr>
+            <tr data-nama="Surat Permohonan PSU" data-kat="Permohonan PSU">
+              <td><div style="display:flex;align-items:center;gap:9px"><span style="font-size:20px">📄</span><div><div style="font-weight:700;font-size:13px">Surat Permohonan PSU</div><div style="font-size:11px;color:var(--muted)">Template surat pengajuan penyerahan PSU</div></div></div></td>
+              <td><span class="badge pending">Permohonan PSU</span></td>
+              <td><span class="tpl-fmt docx">DOCX</span></td>
+              <td>210 KB</td><td>Admin DPUTR</td><td>08 Jan 2025</td><td>57×</td>
+              <td><div class="td-actions">
+                <button class="btn btn-outline btn-sm" onclick="openModal('modal-edit-template')">Edit</button>
+                <button class="btn btn-success btn-sm">⬇ Unduh</button>
+                <button class="btn btn-danger btn-sm" onclick="confirmHapus(this)">Hapus</button>
+              </div></td>
+            </tr>
+            <tr data-nama="Peta Situasi Jalan" data-kat="Teknis & Geometrik">
+              <td><div style="display:flex;align-items:center;gap:9px"><span style="font-size:20px">🗺️</span><div><div style="font-weight:700;font-size:13px">Peta Situasi Jalan</div><div style="font-size:11px;color:var(--muted)">Format peta situasi untuk lampiran SK</div></div></div></td>
+              <td><span class="badge draft">Teknis & Geometrik</span></td>
+              <td><span class="tpl-fmt pdf">PDF</span></td>
+              <td>1,2 MB</td><td>Admin DPUTR</td><td>05 Jan 2025</td><td>18×</td>
+              <td><div class="td-actions">
+                <button class="btn btn-outline btn-sm" onclick="openModal('modal-edit-template')">Edit</button>
+                <button class="btn btn-success btn-sm">⬇ Unduh</button>
+                <button class="btn btn-danger btn-sm" onclick="confirmHapus(this)">Hapus</button>
+              </div></td>
+            </tr>
+            <tr data-nama="Data Geometrik Jalan" data-kat="Teknis & Geometrik">
+              <td><div style="display:flex;align-items:center;gap:9px"><span style="font-size:20px">📐</span><div><div style="font-weight:700;font-size:13px">Data Geometrik Jalan</div><div style="font-size:11px;color:var(--muted)">Template data geometrik dan struktur jalan</div></div></div></td>
+              <td><span class="badge draft">Teknis & Geometrik</span></td>
+              <td><span class="tpl-fmt xlsx">XLSX</span></td>
+              <td>176 KB</td><td>Admin DPUTR</td><td>05 Jan 2025</td><td>12×</td>
+              <td><div class="td-actions">
+                <button class="btn btn-outline btn-sm" onclick="openModal('modal-edit-template')">Edit</button>
+                <button class="btn btn-success btn-sm">⬇ Unduh</button>
+                <button class="btn btn-danger btn-sm" onclick="confirmHapus(this)">Hapus</button>
+              </div></td>
+            </tr>
+            <tr data-nama="Berita Acara Serah Terima" data-kat="SK & Administrasi">
+              <td><div style="display:flex;align-items:center;gap:9px"><span style="font-size:20px">🏗️</span><div><div style="font-weight:700;font-size:13px">Berita Acara Serah Terima</div><div style="font-size:11px;color:var(--muted)">Template BAST prasarana umum lingkungan</div></div></div></td>
+              <td><span class="badge review">SK & Administrasi</span></td>
+              <td><span class="tpl-fmt docx">DOCX</span></td>
+              <td>188 KB</td><td>Admin DPUTR</td><td>03 Jan 2025</td><td>29×</td>
+              <td><div class="td-actions">
+                <button class="btn btn-outline btn-sm" onclick="openModal('modal-edit-template')">Edit</button>
+                <button class="btn btn-success btn-sm">⬇ Unduh</button>
+                <button class="btn btn-danger btn-sm" onclick="confirmHapus(this)">Hapus</button>
+              </div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tbl-pagination">
+        <span id="tpl-showing">Menampilkan 6 dari 6 template</span>
+        <div class="page-btns"><button class="page-btn active">1</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE: MANAJEMEN PENGGUNA ═══ -->
+  <div class="page-view" id="page-users">
+    <div class="card">
+      <div class="table-toolbar">
+        <div class="table-search">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="color:var(--muted);flex-shrink:0"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input type="text" placeholder="Cari nama, email, NIP…"/>
+        </div>
+        <div class="table-actions">
+          <button class="btn btn-primary btn-sm" onclick="openModal('modal-form-user')">+ Tambah Pengguna</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Nama</th><th>NIP</th><th>Email</th><th>Jabatan</th><th>Role</th><th>Status</th><th>Aksi</th></tr></thead>
+          <tbody>
+            <tr><td><div style="display:flex;align-items:center;gap:9px"><div class="user-avatar" style="width:32px;height:32px;font-size:12px;border-radius:8px">A</div><div><div style="font-size:13px;font-weight:700">Admin DPUTR</div><div style="font-size:11px;color:var(--muted)">admin@dputr.go.id</div></div></div></td><td>199001012020011001</td><td>admin@dputr.go.id</td><td>Kepala Seksi</td><td><span class="badge review">Super Admin</span></td><td><span class="badge done">Aktif</span></td><td><div class="td-actions"><button class="btn btn-primary btn-sm" onclick="openModal('modal-form-user')">Edit</button></div></td></tr>
+            <tr><td><div style="display:flex;align-items:center;gap:9px"><div class="user-avatar" style="width:32px;height:32px;font-size:12px;border-radius:8px;background:linear-gradient(135deg,#22c55e,#16a34a)">B</div><div><div style="font-size:13px;font-weight:700">Budi Santoso</div><div style="font-size:11px;color:var(--muted)">budi@dputr.go.id</div></div></div></td><td>198505152010011002</td><td>budi@dputr.go.id</td><td>Staf Teknik</td><td><span class="badge done">Operator</span></td><td><span class="badge done">Aktif</span></td><td><div class="td-actions"><button class="btn btn-primary btn-sm" onclick="openModal('modal-form-user')">Edit</button><button class="btn btn-danger btn-sm">Nonaktif</button></div></td></tr>
+            <tr><td><div style="display:flex;align-items:center;gap:9px"><div class="user-avatar" style="width:32px;height:32px;font-size:12px;border-radius:8px;background:linear-gradient(135deg,#f97316,#ea580c)">S</div><div><div style="font-size:13px;font-weight:700">Siti Rahayu</div><div style="font-size:11px;color:var(--muted)">siti@dputr.go.id</div></div></div></td><td>199203082015012003</td><td>siti@dputr.go.id</td><td>Verifikator</td><td><span class="badge pending">Verifikator</span></td><td><span class="badge done">Aktif</span></td><td><div class="td-actions"><button class="btn btn-primary btn-sm" onclick="openModal('modal-form-user')">Edit</button><button class="btn btn-danger btn-sm">Nonaktif</button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /page-body -->
+</div><!-- /main -->
+
+<!-- ═══════════ MODALS ═══════════ -->
+
+<!-- Modal: Form Tambah/Edit Data Jalan -->
+<div class="modal-overlay" id="modal-form-jalan" onclick="closeOnOverlay(event,this)">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title">📍 Form Data Jalan</div><button class="modal-close" onclick="closeModal('modal-form-jalan')">×</button></div>
+    <div class="modal-body">
+      <div class="form-section">
+        <div class="form-section-title">Identitas Jalan</div>
+        <div class="form-grid cols-2">
+          <div class="form-group span-2"><label class="lbl">Nama Jalan <span class="req">*</span></label><input type="text" class="form-control" placeholder="Contoh: Jl. Melati Raya"/></div>
+          <div class="form-group"><label class="lbl">Kecamatan <span class="req">*</span></label><select class="form-control"><option value="">-- Pilih Kecamatan --</option><option>Kec. Utara</option><option>Kec. Selatan</option><option>Kec. Tengah</option><option>Kec. Barat</option><option>Kec. Timur</option></select></div>
+          <div class="form-group"><label class="lbl">Kelurahan/Desa</label><input type="text" class="form-control" placeholder="Nama kelurahan/desa"/></div>
+          <div class="form-group"><label class="lbl">Nomor Ruas</label><input type="text" class="form-control" placeholder="Contoh: 001"/></div>
+          <div class="form-group"><label class="lbl">Tahun Data <span class="req">*</span></label><select class="form-control"><option>2024</option><option>2023</option><option>2022</option></select></div>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title">Data Teknis</div>
+        <div class="form-grid cols-3">
+          <div class="form-group"><label class="lbl">Panjang (meter) <span class="req">*</span></label><input type="number" class="form-control" placeholder="0"/></div>
+          <div class="form-group"><label class="lbl">Lebar (meter) <span class="req">*</span></label><input type="number" class="form-control" placeholder="0"/></div>
+          <div class="form-group"><label class="lbl">Luas (m²)</label><input type="number" class="form-control" placeholder="Otomatis terhitung" readonly/></div>
+          <div class="form-group"><label class="lbl">Jenis Permukaan <span class="req">*</span></label><select class="form-control"><option value="">-- Pilih --</option><option>Aspal</option><option>Beton</option><option>Paving</option><option>Tanah</option><option>Kerikil</option></select></div>
+          <div class="form-group"><label class="lbl">Kondisi Jalan <span class="req">*</span></label><select class="form-control"><option value="">-- Pilih --</option><option>Baik</option><option>Sedang</option><option>Rusak Ringan</option><option>Rusak Berat</option></select></div>
+          <div class="form-group"><label class="lbl">Fungsi Jalan</label><select class="form-control"><option>Jalan Lingkungan</option><option>Jalan Lokal</option><option>Jalan Kabupaten</option></select></div>
+          <div class="form-group"><label class="lbl">Koordinat Awal</label><input type="text" class="form-control" placeholder="-7.123456, 110.456789"/></div>
+          <div class="form-group"><label class="lbl">Koordinat Akhir</label><input type="text" class="form-control" placeholder="-7.123456, 110.456789"/></div>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title">Keterangan Tambahan</div>
+        <div class="form-grid">
+          <div class="form-group"><label class="lbl">Catatan Kondisi</label><textarea class="form-control" placeholder="Deskripsikan kondisi jalan secara detail…"></textarea></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-form-jalan')">Batal</button><button class="btn btn-primary">💾 Simpan Data</button></div>
+  </div>
+</div>
+
+<!-- Modal: Detail Data Jalan -->
+<div class="modal-overlay" id="modal-detail-jalan" onclick="closeOnOverlay(event,this)">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title">📍 Detail Data Jalan — Jl. Melati Raya</div><button class="modal-close" onclick="closeModal('modal-detail-jalan')">×</button></div>
+    <div class="modal-body">
+      <div class="tab-bar">
+        <button class="tab-item active" onclick="switchTab(this,'tab-info')">Informasi Umum</button>
+        <button class="tab-item" onclick="switchTab(this,'tab-teknis')">Data Teknis</button>
+        <button class="tab-item" onclick="switchTab(this,'tab-history')">Riwayat</button>
+      </div>
+      <div class="tab-panel active" id="tab-info">
+        <div class="detail-list">
+          <div class="detail-item"><span class="lbl">Nama Jalan</span><span class="val">Jl. Melati Raya</span></div>
+          <div class="detail-item"><span class="lbl">Kecamatan</span><span class="val">Kec. Utara</span></div>
+          <div class="detail-item"><span class="lbl">Kelurahan</span><span class="val">Kel. Melati Indah</span></div>
+          <div class="detail-item"><span class="lbl">Nomor Ruas</span><span class="val">001</span></div>
+          <div class="detail-item"><span class="lbl">Fungsi Jalan</span><span class="val">Jalan Lingkungan</span></div>
+          <div class="detail-item"><span class="lbl">Tahun Data</span><span class="val">2024</span></div>
+          <div class="detail-item"><span class="lbl">Status</span><span class="val"><span class="badge done">Baik</span></span></div>
+        </div>
+      </div>
+      <div class="tab-panel" id="tab-teknis">
+        <div class="detail-list">
+          <div class="detail-item"><span class="lbl">Panjang</span><span class="val">1.240 meter</span></div>
+          <div class="detail-item"><span class="lbl">Lebar</span><span class="val">4,5 meter</span></div>
+          <div class="detail-item"><span class="lbl">Luas</span><span class="val">5.580 m²</span></div>
+          <div class="detail-item"><span class="lbl">Jenis Permukaan</span><span class="val">Aspal</span></div>
+          <div class="detail-item"><span class="lbl">Kondisi</span><span class="val">Baik</span></div>
+          <div class="detail-item"><span class="lbl">Koordinat Awal</span><span class="val">-7.123456, 110.456789</span></div>
+          <div class="detail-item"><span class="lbl">Koordinat Akhir</span><span class="val">-7.124321, 110.458123</span></div>
+        </div>
+      </div>
+      <div class="tab-panel" id="tab-history">
+        <div class="detail-list">
+          <div class="detail-item"><span class="lbl">12 Jan 2025</span><span class="val">Data diperbarui oleh Admin DPUTR</span></div>
+          <div class="detail-item"><span class="lbl">05 Jun 2024</span><span class="val">Kondisi diubah: Sedang → Baik</span></div>
+          <div class="detail-item"><span class="lbl">10 Jan 2024</span><span class="val">Data pertama kali diinput</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-detail-jalan')">Tutup</button><button class="btn btn-primary" onclick="closeModal('modal-detail-jalan');openModal('modal-form-jalan')">Edit Data</button></div>
+  </div>
+</div>
+
+<!-- Modal: Form SK Jalan -->
+<div class="modal-overlay" id="modal-form-sk" onclick="closeOnOverlay(event,this)">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title">📄 Form SK Jalan Lingkungan</div><button class="modal-close" onclick="closeModal('modal-form-sk')">×</button></div>
+    <div class="modal-body">
+      <div class="form-section">
+        <div class="form-section-title">Data SK</div>
+        <div class="form-grid cols-2">
+          <div class="form-group"><label class="lbl">Nomor SK <span class="req">*</span></label><input type="text" class="form-control" placeholder="SK/XXX/2024"/></div>
+          <div class="form-group"><label class="lbl">Tanggal SK <span class="req">*</span></label><input type="date" class="form-control"/></div>
+          <div class="form-group span-2"><label class="lbl">Nama Jalan <span class="req">*</span></label><select class="form-control"><option value="">-- Pilih Jalan --</option><option>Jl. Melati Raya</option><option>Jl. Kenanga II</option><option>Jl. Mawar Indah</option></select></div>
+          <div class="form-group"><label class="lbl">Panjang (meter)</label><input type="number" class="form-control" placeholder="0" readonly/><div class="form-hint">Otomatis dari data jalan</div></div>
+          <div class="form-group"><label class="lbl">Lebar (meter)</label><input type="number" class="form-control" placeholder="0" readonly/></div>
+          <div class="form-group"><label class="lbl">Ditandatangani Oleh</label><input type="text" class="form-control" placeholder="Kepala Dinas"/></div>
+          <div class="form-group"><label class="lbl">Jabatan Penandatangan</label><input type="text" class="form-control" placeholder="Kepala Dinas DPUTR"/></div>
+          <div class="form-group span-2"><label class="lbl">Keterangan</label><textarea class="form-control" placeholder="Keterangan tambahan untuk SK…"></textarea></div>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title">Lampiran Dokumen</div>
+        <div class="file-drop" onclick="document.getElementById('file-sk').click()">
+          <input type="file" id="file-sk" style="display:none" multiple/>
+          <div class="file-drop-icon">📎</div>
+          <div class="file-drop-text">Klik untuk upload atau drag & drop</div>
+          <div class="file-drop-sub">PDF, DOC, JPG maks. 10 MB per file</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-form-sk')">Batal</button><button class="btn btn-outline">Simpan Draft</button><button class="btn btn-primary">🖨 Terbitkan SK</button></div>
+  </div>
+</div>
+
+<!-- Modal: Detail SK -->
+<div class="modal-overlay" id="modal-detail-sk" onclick="closeOnOverlay(event,this)">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">📄 Detail SK/001/2024</div><button class="modal-close" onclick="closeModal('modal-detail-sk')">×</button></div>
+    <div class="modal-body">
+      <div class="alert success">✅ SK ini telah aktif dan ditandatangani oleh Kepala Dinas.</div>
+      <div class="detail-list">
+        <div class="detail-item"><span class="lbl">Nomor SK</span><span class="val">SK/001/2024</span></div>
+        <div class="detail-item"><span class="lbl">Nama Jalan</span><span class="val">Jl. Melati Raya</span></div>
+        <div class="detail-item"><span class="lbl">Kecamatan</span><span class="val">Kec. Utara</span></div>
+        <div class="detail-item"><span class="lbl">Panjang</span><span class="val">1.240 meter</span></div>
+        <div class="detail-item"><span class="lbl">Tanggal SK</span><span class="val">15 Maret 2024</span></div>
+        <div class="detail-item"><span class="lbl">Ditandatangani</span><span class="val">Kepala Dinas DPUTR</span></div>
+        <div class="detail-item"><span class="lbl">Status</span><span class="val"><span class="badge done">Aktif</span></span></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-detail-sk')">Tutup</button><button class="btn btn-success">⬇ Unduh PDF</button></div>
+  </div>
+</div>
+
+<!-- Modal: Form Permohonan PSU -->
+<div class="modal-overlay" id="modal-form-psu" onclick="closeOnOverlay(event,this)">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title">📥 Form Permohonan PSU</div><button class="modal-close" onclick="closeModal('modal-form-psu')">×</button></div>
+    <div class="modal-body">
+      <div class="form-section">
+        <div class="form-section-title">Data Pemohon</div>
+        <div class="form-grid cols-2">
+          <div class="form-group"><label class="lbl">Nama Pemohon <span class="req">*</span></label><input type="text" class="form-control" placeholder="Nama lengkap pemohon"/></div>
+          <div class="form-group"><label class="lbl">NIK / No. KTP <span class="req">*</span></label><input type="text" class="form-control" placeholder="16 digit NIK"/></div>
+          <div class="form-group"><label class="lbl">No. Telepon <span class="req">*</span></label><input type="text" class="form-control" placeholder="08xxxxxxxxxx"/></div>
+          <div class="form-group"><label class="lbl">Email</label><input type="email" class="form-control" placeholder="email@domain.com"/></div>
+          <div class="form-group span-2"><label class="lbl">Alamat Pemohon</label><textarea class="form-control" style="min-height:70px" placeholder="Alamat lengkap pemohon…"></textarea></div>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title">Data Jalan yang Dimohonkan</div>
+        <div class="form-grid cols-2">
+          <div class="form-group span-2"><label class="lbl">Nama Jalan <span class="req">*</span></label><input type="text" class="form-control" placeholder="Nama jalan yang dimohonkan"/></div>
+          <div class="form-group"><label class="lbl">Kecamatan <span class="req">*</span></label><select class="form-control"><option value="">-- Pilih --</option><option>Kec. Utara</option><option>Kec. Selatan</option><option>Kec. Tengah</option><option>Kec. Barat</option><option>Kec. Timur</option></select></div>
+          <div class="form-group"><label class="lbl">Kelurahan/Desa</label><input type="text" class="form-control" placeholder="Nama kelurahan"/></div>
+          <div class="form-group"><label class="lbl">Panjang Jalan (m) <span class="req">*</span></label><input type="number" class="form-control" placeholder="0"/></div>
+          <div class="form-group"><label class="lbl">Lebar Jalan (m) <span class="req">*</span></label><input type="number" class="form-control" placeholder="0"/></div>
+          <div class="form-group span-2"><label class="lbl">Alasan / Dasar Permohonan</label><textarea class="form-control" placeholder="Jelaskan alasan permohonan PSU…"></textarea></div>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title">Upload Dokumen Persyaratan</div>
+        <div class="alert warn">⚠️ Dokumen wajib: Surat permohonan, KTP pemohon, bukti kepemilikan tanah, gambar situasi jalan.</div>
+        <div class="file-drop" onclick="document.getElementById('file-psu').click()">
+          <input type="file" id="file-psu" style="display:none" multiple/>
+          <div class="file-drop-icon">📂</div>
+          <div class="file-drop-text">Klik untuk upload dokumen persyaratan</div>
+          <div class="file-drop-sub">PDF, JPG, PNG maks. 5 MB per file</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-form-psu')">Batal</button><button class="btn btn-primary">📨 Ajukan Permohonan</button></div>
+  </div>
+</div>
+
+<!-- Modal: Detail PSU -->
+<div class="modal-overlay" id="modal-detail-psu" onclick="closeOnOverlay(event,this)">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title">📥 Detail Permohonan #PSU-2024-001</div><button class="modal-close" onclick="closeModal('modal-detail-psu')">×</button></div>
+    <div class="modal-body">
+      <div class="tab-bar">
+        <button class="tab-item active" onclick="switchTab(this,'tab-p-info')">Data Pemohon</button>
+        <button class="tab-item" onclick="switchTab(this,'tab-p-jalan')">Data Jalan</button>
+        <button class="tab-item" onclick="switchTab(this,'tab-p-dok')">Dokumen</button>
+      </div>
+      <div class="tab-panel active" id="tab-p-info">
+        <div class="detail-list">
+          <div class="detail-item"><span class="lbl">Nama Pemohon</span><span class="val">Budi Santoso</span></div>
+          <div class="detail-item"><span class="lbl">NIK</span><span class="val">3374010101900001</span></div>
+          <div class="detail-item"><span class="lbl">No. Telepon</span><span class="val">0812-3456-7890</span></div>
+          <div class="detail-item"><span class="lbl">Email</span><span class="val">budi@email.com</span></div>
+          <div class="detail-item"><span class="lbl">Tanggal Masuk</span><span class="val">10 Januari 2024</span></div>
+          <div class="detail-item"><span class="lbl">Status</span><span class="val"><span class="badge review">Review</span></span></div>
+        </div>
+      </div>
+      <div class="tab-panel" id="tab-p-jalan">
+        <div class="detail-list">
+          <div class="detail-item"><span class="lbl">Nama Jalan</span><span class="val">Jl. Mawar Indah</span></div>
+          <div class="detail-item"><span class="lbl">Kecamatan</span><span class="val">Kec. Tengah</span></div>
+          <div class="detail-item"><span class="lbl">Panjang</span><span class="val">450 meter</span></div>
+          <div class="detail-item"><span class="lbl">Lebar</span><span class="val">4,0 meter</span></div>
+          <div class="detail-item"><span class="lbl">Alasan Permohonan</span><span class="val">Jalan perumahan yang telah selesai dibangun dan siap diserahterimakan kepada pemerintah.</span></div>
+        </div>
+      </div>
+      <div class="tab-panel" id="tab-p-dok">
+        <div class="file-list">
+          <div class="file-item"><span style="font-size:18px">📄</span><div class="file-item-name">Surat_Permohonan_PSU.pdf</div><span class="file-item-size">1,2 MB</span><button class="btn btn-success btn-sm">⬇</button></div>
+          <div class="file-item"><span style="font-size:18px">📄</span><div class="file-item-name">KTP_Pemohon.pdf</div><span class="file-item-size">0,4 MB</span><button class="btn btn-success btn-sm">⬇</button></div>
+          <div class="file-item"><span style="font-size:18px">🗺️</span><div class="file-item-name">Gambar_Situasi_Jalan.jpg</div><span class="file-item-size">2,1 MB</span><button class="btn btn-success btn-sm">⬇</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-detail-psu')">Tutup</button><button class="btn btn-danger">✗ Tolak</button><button class="btn btn-success">✓ Setujui</button></div>
+  </div>
+</div>
+
+<!-- Modal: Upload Laporan -->
+<div class="modal-overlay" id="modal-form-laporan" onclick="closeOnOverlay(event,this)">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">📊 Upload Laporan Tahunan</div><button class="modal-close" onclick="closeModal('modal-form-laporan')">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="lbl">Tahun Laporan <span class="req">*</span></label><select class="form-control"><option>2025</option><option>2024</option><option>2023</option></select></div>
+        <div class="form-group"><label class="lbl">Judul Laporan <span class="req">*</span></label><input type="text" class="form-control" placeholder="Laporan Kondisi Jalan Kabupaten…"/></div>
+        <div class="form-group"><label class="lbl">Keterangan</label><textarea class="form-control" placeholder="Deskripsi singkat laporan…"></textarea></div>
+        <div class="form-group">
+          <label class="lbl">File Laporan (PDF) <span class="req">*</span></label>
+          <div class="file-drop" onclick="document.getElementById('file-laporan').click()">
+            <input type="file" id="file-laporan" accept=".pdf" style="display:none"/>
+            <div class="file-drop-icon">📤</div>
+            <div class="file-drop-text">Klik untuk upload file PDF</div>
+            <div class="file-drop-sub">Format PDF maks. 20 MB</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-form-laporan')">Batal</button><button class="btn btn-primary">⬆ Upload Laporan</button></div>
+  </div>
+</div>
+
+<!-- Modal: Form Pengguna -->
+<div class="modal-overlay" id="modal-form-user" onclick="closeOnOverlay(event,this)">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">👤 Form Pengguna</div><button class="modal-close" onclick="closeModal('modal-form-user')">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid cols-2">
+        <div class="form-group span-2"><label class="lbl">Nama Lengkap <span class="req">*</span></label><input type="text" class="form-control" placeholder="Nama lengkap pengguna"/></div>
+        <div class="form-group"><label class="lbl">NIP <span class="req">*</span></label><input type="text" class="form-control" placeholder="18 digit NIP"/></div>
+        <div class="form-group"><label class="lbl">Jabatan</label><input type="text" class="form-control" placeholder="Jabatan/posisi"/></div>
+        <div class="form-group span-2"><label class="lbl">Email <span class="req">*</span></label><input type="email" class="form-control" placeholder="email@instansi.go.id"/></div>
+        <div class="form-group"><label class="lbl">Role <span class="req">*</span></label><select class="form-control"><option>Operator</option><option>Verifikator</option><option>Super Admin</option></select></div>
+        <div class="form-group"><label class="lbl">Status</label><select class="form-control"><option>Aktif</option><option>Nonaktif</option></select></div>
+        <div class="form-group"><label class="lbl">Password Baru</label><input type="password" class="form-control" placeholder="Kosongkan jika tidak diubah"/></div>
+        <div class="form-group"><label class="lbl">Konfirmasi Password</label><input type="password" class="form-control" placeholder="Ulangi password baru"/></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-form-user')">Batal</button><button class="btn btn-primary">💾 Simpan Pengguna</button></div>
+  </div>
+</div>
+
+<!-- Modal: Upload Template Baru -->
+<div class="modal-overlay" id="modal-upload-template" onclick="closeOnOverlay(event,this)">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">⬆ Upload Template Baru</div><button class="modal-close" onclick="closeModal('modal-upload-template')">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="lbl">Nama Template <span class="req">*</span></label><input type="text" class="form-control" placeholder="Contoh: Form Data Jalan 2025"/></div>
+        <div class="form-group"><label class="lbl">Kategori <span class="req">*</span></label>
+          <select class="form-control">
+            <option value="">-- Pilih Kategori --</option>
+            <option>Form Data Jalan</option>
+            <option>SK & Administrasi</option>
+            <option>Laporan</option>
+            <option>Permohonan PSU</option>
+            <option>Teknis & Geometrik</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="lbl">Deskripsi</label><textarea class="form-control" placeholder="Deskripsi singkat template ini…" style="min-height:72px"></textarea></div>
+        <div class="form-group">
+          <label class="lbl">File Template <span class="req">*</span></label>
+          <div class="tpl-dropzone" onclick="document.getElementById('modal-tpl-file').click()" style="padding:24px">
+            <input type="file" id="modal-tpl-file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" style="display:none" onchange="showModalFilePreview(event)"/>
+            <div class="tpl-drop-text" style="font-size:13px">Klik untuk pilih file</div>
+            <div class="tpl-drop-sub">PDF, Word, Excel, PowerPoint — maks. 20 MB</div>
+          </div>
+          <div id="modal-file-preview" style="margin-top:10px"></div>
+        </div>
+        <div class="form-group">
+          <label class="lbl">Visibilitas</label>
+          <select class="form-control">
+            <option>Publik (semua pengguna dapat mengunduh)</option>
+            <option>Hanya Admin</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-upload-template')">Batal</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-upload-template');showToast('Template berhasil diupload!','success')">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+        Upload Template
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Edit Info Template -->
+<div class="modal-overlay" id="modal-edit-template" onclick="closeOnOverlay(event,this)">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">✏️ Edit Info Template</div><button class="modal-close" onclick="closeModal('modal-edit-template')">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="lbl">Nama Template</label><input type="text" class="form-control" value="Form Data Jalan"/></div>
+        <div class="form-group"><label class="lbl">Kategori</label>
+          <select class="form-control">
+            <option selected>Form Data Jalan</option>
+            <option>SK & Administrasi</option>
+            <option>Laporan</option>
+            <option>Permohonan PSU</option>
+            <option>Teknis & Geometrik</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="lbl">Deskripsi</label><textarea class="form-control" style="min-height:72px">Template isian data teknis ruas jalan kabupaten</textarea></div>
+        <div class="form-group">
+          <label class="lbl">Ganti File (opsional)</label>
+          <div class="tpl-dropzone" onclick="document.getElementById('edit-tpl-file').click()" style="padding:20px">
+            <input type="file" id="edit-tpl-file" style="display:none"/>
+            <div class="tpl-drop-sub">Klik untuk mengganti file — kosongkan jika tidak diganti</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-edit-template')">Batal</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-edit-template');showToast('Perubahan disimpan!','success')">💾 Simpan Perubahan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+const pages = {
+  'dashboard':  {title:'Dashboard',            bread:'Beranda / Dashboard Admin'},
+  'data-jalan': {title:'Data Jalan',            bread:'Beranda / Data Jalan'},
+  'laporan':    {title:'Laporan Tahunan',       bread:'Beranda / Laporan Tahunan'},
+  'sk-jalan':   {title:'SK Jalan Lingkungan',   bread:'Beranda / SK Jalan Lingkungan'},
+  'psu':        {title:'Permohonan PSU',        bread:'Beranda / Permohonan PSU'},
+  'template':   {title:'Template Data Teknis',  bread:'Beranda / Template Data Teknis'},
+  'users':      {title:'Manajemen Pengguna',    bread:'Sistem / Manajemen Pengguna'},
+};
+
+function showPage(id, btn) {
+  document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+  document.getElementById('pageTitle').textContent = pages[id].title;
+  document.getElementById('pageBread').textContent = pages[id].bread;
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function closeOnOverlay(e, overlay) { if(e.target===overlay) overlay.classList.remove('open'); }
+
+function switchTab(btn, panelId) {
+  const tabBar = btn.closest('.tab-bar');
+  tabBar.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  const container = btn.closest('.modal-body') || document.body;
+  container.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  const t = document.getElementById(panelId);
+  if(t) t.classList.add('active');
+}
+
+// ── Template upload helpers ──
+function fileIcon(name) {
+  const ext = name.split('.').pop().toLowerCase();
+  return {pdf:'📄',xlsx:'📊',xls:'📊',docx:'📋',doc:'📋',pptx:'📊',ppt:'📊'}[ext] || '📁';
+}
+function fmtSize(bytes) {
+  if(bytes<1024) return bytes+'B';
+  if(bytes<1048576) return (bytes/1024).toFixed(0)+' KB';
+  return (bytes/1048576).toFixed(1)+' MB';
+}
+
+function renderPreviewItem(file) {
+  return `<div class="tpl-preview-item">
+    <span style="font-size:20px">${fileIcon(file.name)}</span>
+    <div style="flex:1;min-width:0">
+      <div class="tpl-preview-name">${file.name}</div>
+      <div class="tpl-preview-size">${fmtSize(file.size)}</div>
+    </div>
+    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:var(--muted);cursor:pointer" onclick="clearPreview()"><path d="M6 18L18 6M6 6l12 12"/></svg>
+  </div>`;
+}
+
+function handleTemplateSelect(event) {
+  const files = Array.from(event.target.files);
+  if(!files.length) return;
+  showPreviewList(files);
+}
+
+function handleTemplateDrop(event) {
+  event.preventDefault();
+  document.getElementById('tplDropzone').classList.remove('drag-over');
+  const files = Array.from(event.dataTransfer.files);
+  if(!files.length) return;
+  showPreviewList(files);
+}
+
+function showPreviewList(files) {
+  const wrap = document.getElementById('tpl-preview-list');
+  const items = document.getElementById('tpl-preview-items');
+  items.innerHTML = files.map(renderPreviewItem).join('');
+  wrap.style.display = 'block';
+}
+
+function clearPreview() {
+  document.getElementById('tpl-preview-list').style.display='none';
+  document.getElementById('tpl-preview-items').innerHTML='';
+  document.getElementById('tpl-file-input').value='';
+}
+
+function simulateUpload() {
+  const items = document.querySelectorAll('.tpl-preview-item');
+  items.forEach(item => {
+    const bar = document.createElement('div');
+    bar.className = 'tpl-preview-prog';
+    bar.innerHTML = '<div class="tpl-preview-bar" style="width:0%"></div>';
+    item.appendChild(bar);
+    let w=0;
+    const interval = setInterval(()=>{
+      w += Math.random()*20 + 10;
+      if(w>=100){ w=100; clearInterval(interval); }
+      bar.querySelector('.tpl-preview-bar').style.width=w+'%';
+      if(w>=100){
+        setTimeout(()=>{ clearPreview(); showToast('File berhasil diupload!','success'); },300);
+      }
+    },120);
+  });
+}
+
+function showModalFilePreview(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  document.getElementById('modal-file-preview').innerHTML = renderPreviewItem(file);
+}
+
+// ── Table search / filter ──
+function filterTemplate(q) {
+  const rows = document.querySelectorAll('#tpl-tbody tr');
+  let count=0;
+  rows.forEach(r=>{
+    const match = r.dataset.nama.toLowerCase().includes(q.toLowerCase());
+    r.style.display = match ? '' : 'none';
+    if(match) count++;
+  });
+  document.getElementById('tpl-showing').textContent=`Menampilkan ${count} dari ${rows.length} template`;
+}
+
+function filterByKategori(kat) {
+  const rows = document.querySelectorAll('#tpl-tbody tr');
+  let count=0;
+  rows.forEach(r=>{
+    const match = !kat || r.dataset.kat===kat;
+    r.style.display = match ? '' : 'none';
+    if(match) count++;
+  });
+  document.getElementById('tpl-showing').textContent=`Menampilkan ${count} dari ${rows.length} template`;
+}
+
+function confirmHapus(btn) {
+  const row = btn.closest('tr');
+  const nama = row.dataset.nama;
+  if(confirm(`Yakin ingin menghapus template "${nama}"?`)) {
+    row.style.opacity='0';
+    row.style.transition='opacity .3s';
+    setTimeout(()=>{ row.remove(); showToast(`Template "${nama}" dihapus.`,'info'); }, 300);
+  }
+}
+
+// ── Hapus Laporan dengan renumbering ──
+function hapusLaporan(btn, nama) {
+  if(confirm(`Yakin ingin menghapus "${nama}"?`)) {
+    const row = btn.closest('tr');
+    row.style.transition = 'opacity .3s';
+    row.style.opacity = '0';
+    setTimeout(() => {
+      row.remove();
+      document.querySelectorAll('#laporan-tbody tr').forEach((r, i) => {
+        r.querySelector('.td-num').textContent = i + 1;
+      });
+      const total = document.querySelectorAll('#laporan-tbody tr').length;
+      document.getElementById('laporan-count').textContent = `Menampilkan ${total} laporan`;
+      showToast(`"${nama}" berhasil dihapus.`, 'info');
+    }, 300);
+  }
+}
+
+// ── Toast ──
+function showToast(msg, type='info') {
+  const wrap = document.getElementById('toastWrap');
+  const icons = {success:'✅', error:'❌', info:'ℹ️'};
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+  wrap.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(()=>t.remove(),300); },3000);
+}
+
+// ── Dark mode ──
+function toggleTheme() {
+  const dark = document.documentElement.classList.toggle('dark');
+  document.getElementById('themeBtn').textContent = dark ? '☀️' : '🌙';
+  localStorage.setItem('sijalan-theme', dark?'dark':'light');
+}
+(function(){
+  const s = localStorage.getItem('sijalan-theme');
+  if(s==='dark'){ document.documentElement.classList.add('dark'); document.addEventListener('DOMContentLoaded',()=>{ const b=document.getElementById('themeBtn'); if(b) b.textContent='☀️'; }); }
+})();
+</script>
+</body>
+</html>

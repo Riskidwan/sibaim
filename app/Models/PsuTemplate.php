@@ -4,7 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\LogsActivity;
+
 class PsuTemplate extends Model
 {
-    protected $fillable = ['title', 'description', 'file_path'];
+    use LogsActivity;
+    protected $fillable = ['title', 'description', 'file_path', 'is_active'];
 }

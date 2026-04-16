@@ -113,6 +113,7 @@
 
                         @php
                             $docs = [
+                                'file_template_diisi' => 'Template Data Teknis Terisi',
                                 'fc_ktp' => 'FC KTP',
                                 'fc_akta_pendirian' => 'FC Akta Pendirian',
                                 'fc_sertifikat_tanah' => 'FC Sertifikat Tanah',
@@ -126,15 +127,23 @@
                             @foreach($docs as $key => $label)
                                 <div class="col-md-6 mb-4">
                                     <label style="font-weight: 600;">{{ $label }}</label>
-                                    <span class="current-file"><i class="fas fa-check-circle"></i> File sudah ada</span>
-                                    <input type="file" name="{{ $key }}" class="form-control-file">
-                                    <p class="file-hint">Format: PDF/JPG/PNG. Max 5MB.</p>
+                                    @if($submission->$key)
+                                        <span class="current-file"><i class="fas fa-check-circle"></i> File sudah ada</span>
+                                    @else
+                                        <span class="current-file" style="color: #e11d48;"><i class="fas fa-times-circle"></i> Belum ada file</span>
+                                    @endif
+                                    <input type="file" name="{{ $key }}" class="form-control-file" {{ $key === 'file_template_diisi' ? 'accept=".pdf,.doc,.docx,.xls,.xlsx,.zip"' : 'accept=".pdf,.jpg,.jpeg,.png"' }}>
+                                    @if($key === 'file_template_diisi')
+                                        <p class="file-hint">Format: Document/Excel/Zip. Max 10MB.</p>
+                                    @else
+                                        <p class="file-hint">Format: PDF/JPG/PNG. Max 5MB.</p>
+                                    @endif
                                 </div>
                             @endforeach
                         </div>
 
                         <div style="margin-top: 30px; display: flex; gap: 15px;">
-                            <a href="{{ url('/cek-status-psu') }}" class="btn btn-secondary" style="flex: 1; padding: 12px; border-radius: 8px;">Batal</a>
+                            <a href="{{ url('/user/dashboard') }}" class="btn btn-secondary" style="flex: 1; padding: 12px; border-radius: 8px;">Batal</a>
                             <button type="submit" class="btn-submit" style="flex: 2; margin: 0;">Simpan Perubahan & Kirim Verifikasi</button>
                         </div>
                     </form>
