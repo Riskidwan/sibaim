@@ -25,7 +25,7 @@
         <ul class="list-unstyled" style="font-size: 14px;">
           <li class="mb-2"><a href="{{ url('/') }}" class="text-white-50 text-decoration-none hover-link">Beranda</a></li>
           <li class="mb-2"><a href="{{ url('/') }}#profil" class="text-white-50 text-decoration-none hover-link">Profil</a></li>
-          <li class="mb-2"><a href="/permohonan-psu" class="text-white-50 text-decoration-none hover-link">Data PSU</a></li>
+          <li class="mb-2"><a href="/permohonan-psu" class="text-white-50 text-decoration-none hover-link">Data</a></li>
           <li class="mb-2"><a href="/download" class="text-white-50 text-decoration-none hover-link">Pusat Unduhan</a></li>
         </ul>
       </div>

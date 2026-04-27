@@ -86,9 +86,19 @@ class PsuSubmissionController extends Controller
         // Handle Verification File
         if ($request->hasFile('file_ba_terbit')) {
             if ($psu_submission->file_ba_terbit) {
-                Storage::disk('public')->delete($psu_submission->file_ba_terbit);
+                Storage::disk('local')->delete($psu_submission->file_ba_terbit);
             }
-            $data['file_ba_terbit'] = $request->file('file_ba_terbit')->store('psu/ba_terbit', 'public');
+            $data['file_ba_terbit'] = $request->file('file_ba_terbit')->store('psu/ba_terbit', 'local');
+        }
+
+        // Handle File Deletions (Explicitly marked for re-upload)
+        if ($request->has('delete_files')) {
+            foreach ($request->delete_files as $fileKey) {
+                if ($psu_submission->$fileKey) {
+                    Storage::disk('local')->delete($psu_submission->$fileKey);
+                    $data[$fileKey] = null;
+                }
+            }
         }
 
         // Handle Submission Files (from edit form)
@@ -97,10 +107,10 @@ class PsuSubmissionController extends Controller
             if ($request->hasFile($fileKey)) {
                 // Delete old file
                 if ($psu_submission->$fileKey) {
-                    Storage::disk('public')->delete($psu_submission->$fileKey);
+                    Storage::disk('local')->delete($psu_submission->$fileKey);
                 }
                 // Store new file
-                $path = $request->file($fileKey)->store('psu_submissions', 'public');
+                $path = $request->file($fileKey)->store('psu_submissions', 'local');
                 $data[$fileKey] = $path;
             }
         }
@@ -119,7 +129,11 @@ class PsuSubmissionController extends Controller
 
         // Send Notification to User if status changed
         if ($oldStatus !== $newStatus && $psu_submission->user) {
-            $psu_submission->user->notify(new SubmissionStatusUpdated($psu_submission, $oldStatus, $newStatus));
+            try {
+                $psu_submission->user->notify(new SubmissionStatusUpdated($psu_submission, $oldStatus, $newStatus));
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Failed to send PSU status update email: ' . $e->getMessage());
+            }
         }
 
         return redirect()->route('admin.psu-submissions.index')->with('success', 'Data permohonan berhasil diperbarui.');
@@ -145,7 +159,7 @@ class PsuSubmissionController extends Controller
 
         foreach ($fileFields as $field) {
             if ($psu_submission->$field) {
-                Storage::disk('public')->delete($psu_submission->$field);
+                Storage::disk('local')->delete($psu_submission->$field);
             }
         }
 

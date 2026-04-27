@@ -33,6 +33,8 @@ trait LogsActivity
             'model_id' => $this->id,
             'description' => $description,
             'properties' => $this->getLogProperties($event),
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
         ]);
     }
 

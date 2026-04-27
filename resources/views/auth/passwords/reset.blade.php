@@ -6,6 +6,7 @@
   <title>Reset Kata Sandi — Portal PSU Kabupaten Pemalang</title>
   <link rel="icon" href="{{ asset('img/logoKab.Pemalang.png') }}" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -44,6 +45,21 @@
     .btn-submit { width:100%; padding:13px; background:linear-gradient(135deg, var(--blue-mid) 0%, var(--blue-light) 100%); border:none; border-radius:12px; color:var(--white); font-family:inherit; font-weight:700; font-size:15px; cursor:pointer; box-shadow:0 6px 20px rgba(18,81,197,0.3); transition:opacity 0.2s, transform 0.15s; margin-top:6px; }
     .btn-submit:hover { opacity:0.92; transform:translateY(-1px); }
     .alert-err { background:#fff1f2; border:1.5px solid #fecdd3; color:#9f1239; border-radius:10px; padding:10px 14px; font-size:13px; margin-bottom:16px; }
+    
+    .password-wrapper { position: relative; width: 100%; }
+    .toggle-password {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: var(--text-muted);
+      z-index: 10;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+    .toggle-password:hover { color: var(--blue-main); }
+    
     @media (max-width: 740px) { .card-wrap { flex-direction:column-reverse; width:95vw; } .logo-panel { width:100%; padding:36px 24px; } .form-panel { padding:36px 24px; } .input-row { grid-template-columns:1fr; } }
   </style>
 </head>
@@ -86,12 +102,18 @@
       <div class="input-row">
         <div class="input-group">
           <label>Kata Sandi Baru</label>
-          <input type="password" name="password" placeholder="Min. 8 karakter" required/>
+          <div class="password-wrapper">
+            <input type="password" name="password" id="password" placeholder="Min. 8 karakter" required/>
+            <i class="fas fa-eye toggle-password" onclick="togglePassword('password', this)"></i>
+          </div>
           @error('password')<span style="color:#e11d48;font-size:12px;margin-top:4px;display:block">{{ $message }}</span>@enderror
         </div>
         <div class="input-group">
           <label>Konfirmasi Sandi</label>
-          <input type="password" name="password_confirmation" placeholder="Ulangi sandi baru" required/>
+          <div class="password-wrapper">
+            <input type="password" name="password_confirmation" id="password-confirm" placeholder="Ulangi sandi baru" required/>
+            <i class="fas fa-eye toggle-password" onclick="togglePassword('password-confirm', this)"></i>
+          </div>
         </div>
       </div>
 
@@ -99,5 +121,21 @@
     </form>
   </div>
 </div>
+
+<script>
+  function togglePassword(inputId, icon) {
+    const input = document.getElementById(inputId);
+    if (input.type === "password") {
+      input.type = "text";
+      icon.classList.remove("fa-eye");
+      icon.classList.add("fa-eye-slash");
+    } else {
+      input.type = "password";
+      icon.classList.remove("fa-eye-slash");
+      icon.classList.add("fa-eye");
+    }
+  }
+</script>
+
 </body>
 </html>

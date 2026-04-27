@@ -16,9 +16,10 @@ class UserController extends Controller
         return view('admin.users.index', compact('users'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        return view('admin.users.create');
+        $type = $request->query('type', 'pejabat');
+        return view('admin.users.create', compact('type'));
     }
 
     public function store(Request $request)
@@ -26,6 +27,7 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
+            'nip' => [Rule::requiredIf(in_array($request->role, ['superadmin', 'kepala'])), 'nullable', 'string', 'unique:users', 'digits:18'],
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|string|in:superadmin,kepala,user',
         ]);
@@ -33,9 +35,11 @@ class UserController extends Controller
         User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'nip' => $request->nip,
             'password' => Hash::make($request->password),
             'role' => $request->role,
             'is_admin' => in_array($request->role, ['superadmin', 'kepala']) ? 1 : 0,
+            'email_verified_at' => now(),
         ]);
 
         return redirect()->route('admin.users.index')->with('success', 'Akun berhasil dibuat.');
@@ -51,17 +55,25 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'nip' => [Rule::requiredIf(in_array($request->role, ['superadmin', 'kepala'])), 'nullable', 'string', Rule::unique('users')->ignore($user->id), 'digits:18'],
             'password' => 'nullable|string|min:8|confirmed',
             'role' => 'required|string|in:superadmin,kepala,user',
         ]);
 
         $user->name = $request->name;
         $user->email = $request->email;
+        $user->nip = $request->nip;
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
         }
         $user->role = $request->role;
         $user->is_admin = in_array($request->role, ['superadmin', 'kepala']) ? 1 : 0;
+        
+        // Auto verify if not already verified when updated by admin
+        if (!$user->email_verified_at) {
+            $user->email_verified_at = now();
+        }
+
         $user->save();
 
         return redirect()->route('admin.users.index')->with('success', 'Akun berhasil diperbarui.');

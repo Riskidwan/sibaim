@@ -7,24 +7,25 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class SubmissionStatusUpdated extends Notification
+class SubmissionReceived extends Notification
 {
     use Queueable;
 
     protected $submission;
-    protected $oldStatus;
-    protected $newStatus;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct($submission, $oldStatus, $newStatus)
+    public function __construct($submission)
     {
         $this->submission = $submission;
-        $this->oldStatus = $oldStatus;
-        $this->newStatus = $newStatus;
     }
 
+    /**
+     * Get the notification's delivery channels.
+     *
+     * @return array<int, string>
+     */
     public function via(object $notifiable): array
     {
         return ['database', 'mail'];
@@ -35,16 +36,16 @@ class SubmissionStatusUpdated extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $status = strtoupper($this->newStatus);
-        
         return (new MailMessage)
-            ->subject('Update Status Permohonan PSU - ' . $this->submission->no_registrasi)
+            ->subject('Konfirmasi Permohonan PSU - ' . $this->submission->no_registrasi)
             ->greeting('Halo, ' . $notifiable->name . '!')
-            ->line('Kami ingin menginformasikan bahwa terdapat pembaruan status pada permohonan PSU Anda.')
+            ->line('Terima kasih telah mengajukan permohonan PSU melalui SIBAIM.')
+            ->line('Permohonan Anda telah kami terima dengan detail sebagai berikut:')
             ->line('**Nomor Registrasi:** ' . $this->submission->no_registrasi)
-            ->line('**Status Saat Ini:** ' . $status)
-            ->line('Jika status memerlukan perbaikan dokumen, mohon segera melengkapi kekurangan melalui dashboard Anda.')
-            ->line('Terima kasih telah menggunakan layanan SIBAIM Kabupaten Pemalang.');
+            ->line('**Lokasi:** ' . $this->submission->lokasi_pembangunan)
+            ->line('**Status:** Verifikasi Dokumen')
+            ->line('Tim kami akan segera memproses berkas Anda. Anda akan menerima notifikasi email kembali jika terdapat pembaruan status.')
+            ->line('Terima kasih.');
     }
 
     /**
@@ -57,11 +58,9 @@ class SubmissionStatusUpdated extends Notification
         return [
             'submission_id' => $this->submission->id,
             'no_registrasi' => $this->submission->no_registrasi,
-            'old_status' => $this->oldStatus,
-            'new_status' => $this->newStatus,
-            'title' => 'Update Status',
-            'type' => 'status',
-            'message' => "Status permohonan " . $this->submission->no_registrasi . " telah diubah menjadi " . $this->newStatus . ".",
+            'title' => 'Permohonan Terkirim',
+            'type' => 'submission',
+            'message' => "Permohonan PSU baru (" . $this->submission->no_registrasi . ") berhasil dikirim dan sedang dalam verifikasi.",
         ];
     }
 }

@@ -313,7 +313,7 @@
                                         <i class="fas fa-edit text-danger"></i>
                                     </a>
                                 @elseif($sub->status === 'BA terima terbit' && $sub->file_ba_terbit)
-                                    <a href="{{ asset('storage/' . $sub->file_ba_terbit) }}" target="_blank" class="btn-table-action" title="Unduh BA">
+                                    <a href="{{ route('psu.file.serve', ['submission' => $sub->id, 'field' => 'file_ba_terbit']) }}" target="_blank" class="btn-table-action" title="Unduh BA">
                                         <i class="fas fa-download text-success"></i>
                                     </a>
                                 @else

@@ -11,6 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->prepend(\App\Http\Middleware\SecurityHeaders::class);
+        $middleware->authenticateSessions();
+        $middleware->redirectGuestsTo(fn ($request) => $request->is('admin/*') || $request->is('admin') ? route('admin.login') : route('login'));
+
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
             'verified.custom' => \App\Http\Middleware\EnsureEmailIsVerifiedCustom::class,

@@ -36,6 +36,18 @@
         transition: all 0.2s;
     }
     .btn-save:hover { background: #e6e600; transform: translateY(-1px); }
+    .password-wrapper { position: relative; }
+    .toggle-password {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #94a3b8;
+        z-index: 10;
+        transition: color 0.2s;
+    }
+    .toggle-password:hover { color: #1e293b; }
 </style>
 @endpush
 
@@ -62,7 +74,10 @@
                     
                     <div class="mb-4">
                         <label class="form-label">Kata Sandi Baru</label>
-                        <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Minimal 8 karakter" required>
+                        <div class="password-wrapper">
+                            <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror" placeholder="Minimal 8 karakter" required>
+                            <i class="fas fa-eye toggle-password" onclick="togglePassword('password', this)"></i>
+                        </div>
                         <div class="form-text mt-2"><i class="fas fa-shield-alt me-1"></i> Kode OTP akan dikirim ke email Anda untuk konfirmasi perubahan.</div>
                         @error('password')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -71,7 +86,10 @@
 
                     <div class="mb-4">
                         <label class="form-label">Konfirmasi Kata Sandi Baru</label>
-                        <input type="password" name="password_confirmation" class="form-control" required>
+                        <div class="password-wrapper">
+                            <input type="password" name="password_confirmation" id="password-confirm" class="form-control" required>
+                            <i class="fas fa-eye toggle-password" onclick="togglePassword('password-confirm', this)"></i>
+                        </div>
                     </div>
 
                     <div class="text-end mt-5">
@@ -85,3 +103,20 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+  function togglePassword(inputId, icon) {
+    const input = document.getElementById(inputId);
+    if (input.type === "password") {
+      input.type = "text";
+      icon.classList.remove("fa-eye");
+      icon.classList.add("fa-eye-slash");
+    } else {
+      input.type = "password";
+      icon.classList.remove("fa-eye-slash");
+      icon.classList.add("fa-eye");
+    }
+  }
+</script>
+@endpush

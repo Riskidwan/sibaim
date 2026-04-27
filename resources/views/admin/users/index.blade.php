@@ -9,8 +9,11 @@
             <p class="text-subtitle text-muted">Kelola akses dan akun administrator</p>
         </div>
         <div>
-            <a href="{{ route('admin.users.create') }}" class="btn btn-primary btn-sm">
-                <i class="bi bi-person-plus"></i> Tambah Akun
+            <a href="{{ route('admin.users.create', ['type' => 'pejabat']) }}" class="btn btn-outline-primary btn-sm me-2">
+                <i class="bi bi-person-badge"></i> Tambah Pejabat
+            </a>
+            <a href="{{ route('admin.users.create', ['type' => 'pemohon']) }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-people"></i> Tambah Pemohon
             </a>
         </div>
     </div>
@@ -21,6 +24,7 @@
                     <tr>
                         <th style="width: 50px;">No</th>
                         <th>Nama</th>
+                        <th>NIP</th>
                         <th>Email</th>
                         <th>Role</th>
                         <th class="text-center">Aksi</th>
@@ -38,6 +42,7 @@
                                     <div class="text-bold-500">{{ $user->name }}</div>
                                 </div>
                             </td>
+                            <td>{{ $user->nip ?: '-' }}</td>
                             <td>{{ $user->email }}</td>
                             <td>
                                 @if($user->role === 'superadmin')
@@ -67,7 +72,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center py-4">
+                            <td colspan="6" class="text-center py-4">
                                 <div class="empty-state">
                                     <div class="empty-icon text-muted mb-2"><i class="bi bi-people" style="font-size: 2rem;"></i></div>
                                     <h6>Tidak ada data pengguna</h6>

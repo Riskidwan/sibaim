@@ -21,10 +21,16 @@ class EnsureEmailIsVerifiedCustom
 
         $user = \Illuminate\Support\Facades\Auth::user();
 
-        // Only redirect to OTP if email is not verified AND there is a pending OTP code
+        // Bypass for admins - admins are trusted and shouldn't be blocked by email verification
+        if ($user->is_admin) {
+            return $next($request);
+        }
+
+        // Only redirect to login if email is not verified AND there is a pending OTP code
         // This allows existing/manually created accounts without an OTP code to skip verification
-        if (!$user->email_verified_at && $user->otp_code && !$request->is('auth/verify-otp', 'auth/resend-otp')) {
-            return redirect()->route('auth.verify-otp');
+        if (!$user->email_verified_at && $user->otp_code && !$request->is('login', 'logout')) {
+            \Illuminate\Support\Facades\Auth::logout();
+            return redirect('/login')->with('error', 'Akun Anda belum terverifikasi. Silakan hubungi admin atau daftar ulang.');
         }
 
         return $next($request);

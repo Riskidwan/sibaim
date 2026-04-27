@@ -61,20 +61,45 @@
                     @endphp
                     @foreach($docs as $key => $label)
                         @php
-                            $ext = pathinfo($submission->$key, PATHINFO_EXTENSION);
                             $iconClass = 'bi-file-earmark';
                             $iconColor = 'text-muted';
                             
-                            if ($ext === 'pdf') { $iconClass = 'bi-file-earmark-pdf'; $iconColor = 'text-danger'; }
-                            elseif (in_array($ext, ['doc', 'docx'])) { $iconClass = 'bi-file-earmark-word'; $iconColor = 'text-primary'; }
-                            elseif (in_array($ext, ['xls', 'xlsx'])) { $iconClass = 'bi-file-earmark-excel'; $iconColor = 'text-success'; }
+                            if ($submission->$key) {
+                                $ext = pathinfo($submission->$key, PATHINFO_EXTENSION);
+                                if ($ext === 'pdf') { $iconClass = 'bi-file-earmark-pdf'; $iconColor = 'text-danger'; }
+                                elseif (in_array($ext, ['doc', 'docx'])) { $iconClass = 'bi-file-earmark-word'; $iconColor = 'text-primary'; }
+                                elseif (in_array($ext, ['xls', 'xlsx'])) { $iconClass = 'bi-file-earmark-excel'; $iconColor = 'text-success'; }
+                            }
                         @endphp
-                        <div class="col-md-6">
-                            <a href="{{ asset('storage/' . $submission->$key) }}" target="_blank" class="d-flex align-items-center gap-3 p-3 border rounded-3 bg-light text-decoration-none transition-hover">
-                                <i class="bi {{ $iconClass }} fs-4 {{ $iconColor }}"></i>
-                                <span class="flex-grow-1 small fw-bold">{{ $label }}</span>
-                                <i class="bi bi-box-arrow-up-right text-muted small"></i>
-                            </a>
+                        <div class="col-md-6 position-relative" id="file-wrapper-{{ $key }}">
+                            @if($submission->$key)
+                                <a href="{{ route('psu.file.serve', ['submission' => $submission->id, 'field' => $key]) }}" target="_blank" class="d-flex align-items-center gap-3 p-3 border rounded-3 bg-light text-decoration-none transition-hover">
+                                    <i class="bi {{ $iconClass }} fs-4 {{ $iconColor }}"></i>
+                                    <span class="flex-grow-1 small fw-bold">{{ $label }}</span>
+                                    <i class="bi bi-box-arrow-up-right text-muted small"></i>
+                                </a>
+                                @if(!Auth::user()->isKepala())
+                                <button type="button" class="btn btn-danger btn-sm rounded-circle position-absolute reject-btn" 
+                                        style="top: -10px; right: 5px; width: 24px; height: 24px; padding: 0; display: {{ $submission->status === 'perbaikan dokumen' ? 'flex' : 'none' }}; align-items: center; justify-content: center; border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.2);"
+                                        onclick="rejectFileFromDetail('{{ $key }}', '{{ $label }}')" title="Tolak Berkas Ini">
+                                    <i class="bi bi-x" style="font-size: 1rem;"></i>
+                                </button>
+                                @endif
+                                <div id="rejected-status-{{ $key }}" class="position-absolute w-100 h-100 d-none align-items-center justify-content-center rounded-3" 
+                                     style="top: 0; left: 0; background: rgba(255,255,255,0.85); z-index: 5; border: 2px dashed #dc3545;">
+                                    <span class="badge bg-danger"><i class="bi bi-trash me-1"></i> Akan Dihapus</span>
+                                </div>
+                            @else
+                                <div class="d-flex align-items-center gap-3 p-3 border rounded-3 text-decoration-none border-dashed" style="background-color: rgba(255, 193, 7, 0.1);">
+                                    <i class="bi bi-file-earmark-x fs-4 text-warning"></i>
+                                    <div class="flex-grow-1">
+                                        <span class="small fw-bold text-dark-emphasis d-block">{{ $label }}</span>
+                                        <span class="text-danger" style="font-size: 0.7rem; font-weight: 600;">
+                                            <i class="bi bi-exclamation-circle-fill me-1"></i>Ditolak / Belum Ada
+                                        </span>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     @endforeach
                 </div>
@@ -93,6 +118,8 @@
                 <form action="{{ route('admin.psu-submissions.update', $submission->id) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
+                    
+                    <div id="deleted-files-input-container"></div>
                     
                     <div class="form-group mb-3">
                         <label for="status-select" class="form-label">Ubah Status</label>
@@ -116,7 +143,7 @@
                         <label class="form-label">File BA Terima (PDF/Gambar)</label>
                         @if($submission->file_ba_terbit)
                             <div class="mb-2">
-                                <a href="{{ asset('storage/' . $submission->file_ba_terbit) }}" target="_blank" class="btn btn-sm btn-outline-info">
+                                <a href="{{ route('psu.file.serve', ['submission' => $submission->id, 'field' => 'file_ba_terbit']) }}" target="_blank" class="btn btn-sm btn-outline-info">
                                     <i class="bi bi-file-earmark-pdf"></i> Lihat File Saat Ini
                                 </a>
                             </div>
@@ -156,7 +183,7 @@
                     <div class="fw-bold p-3 bg-light rounded-3 border-start border-3 border-success">{{ $submission->nomor_surat_ba }}</div>
                     @if($submission->file_ba_terbit)
                         <div class="mt-2 text-center">
-                            <a href="{{ asset('storage/' . $submission->file_ba_terbit) }}" target="_blank" class="btn btn-sm btn-success w-100">
+                            <a href="{{ route('psu.file.serve', ['submission' => $submission->id, 'field' => 'file_ba_terbit']) }}" target="_blank" class="btn btn-sm btn-success w-100">
                                 <i class="bi bi-download me-1"></i> Unduh Berkas BA
                             </a>
                         </div>
@@ -177,11 +204,14 @@
     document.getElementById('status-select').addEventListener('change', function() {
         const noteSection = document.getElementById('note-section');
         const baSection = document.getElementById('ba-section');
+        const rejectButtons = document.querySelectorAll('.reject-btn');
         
         if (this.value === 'perbaikan dokumen') {
             noteSection.style.display = 'block';
+            rejectButtons.forEach(btn => btn.style.display = 'flex');
         } else {
             noteSection.style.display = 'none';
+            rejectButtons.forEach(btn => btn.style.display = 'none');
         }
 
         if (this.value === 'BA terima terbit') {
@@ -190,6 +220,29 @@
             baSection.style.display = 'none';
         }
     });
+
+    function rejectFileFromDetail(key, label) {
+        if (confirm(`Apakah Anda yakin ingin menolak berkas ${label}?`)) {
+            // Show overlay
+            document.getElementById('rejected-status-' + key).classList.remove('d-none');
+            document.getElementById('rejected-status-' + key).classList.add('d-flex');
+            
+            // Add hidden input to form
+            const container = document.getElementById('deleted-files-input-container');
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'delete_files[]';
+            input.value = key;
+            container.appendChild(input);
+
+            // Automatically switch status to "Perbaikan Dokumen" if not already
+            const statusSelect = document.getElementById('status-select');
+            if (statusSelect.value !== 'perbaikan dokumen') {
+                statusSelect.value = 'perbaikan dokumen';
+                statusSelect.dispatchEvent(new Event('change'));
+            }
+        }
+    }
 </script>
 @endpush
 @endsection

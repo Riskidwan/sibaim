@@ -33,6 +33,42 @@ class LoginController extends Controller implements HasMiddleware
     }
 
     /**
+     * Get the needed authorization credentials from the request.
+     */
+    protected function credentials(\Illuminate\Http\Request $request)
+    {
+        $credentials = $request->only($this->username(), 'password');
+        
+        // HANYA perbolehkan user dengan role 'user' (Pemohon)
+        // Pejabat (Admin/Kepala) HARUS login via halaman admin menggunakan NIP
+        $credentials['role'] = 'user';
+        
+        return $credentials;
+    }
+
+    /**
+     * Auto-verify user after successful login if not verified.
+     */
+    protected function authenticated(\Illuminate\Http\Request $request, $user)
+    {
+        // Double check role security
+        if ($user->role !== 'user') {
+            auth()->logout();
+            return redirect()->route('login')->withErrors([
+                'email' => 'Akun pejabat harus login melalui Panel Admin menggunakan NIP.',
+            ]);
+        }
+
+        if (!$user->email_verified_at) {
+            $user->update([
+                'email_verified_at' => now(),
+                'otp_code' => null,
+                'otp_expires_at' => null
+            ]);
+        }
+    }
+
+    /**
      * Create a new controller instance.
      *
      * @return void

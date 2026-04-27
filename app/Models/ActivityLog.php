@@ -11,6 +11,8 @@ class ActivityLog extends \Illuminate\Database\Eloquent\Model
         'model_id',
         'description',
         'properties',
+        'ip_address',
+        'user_agent',
     ];
 
     protected $casts = [

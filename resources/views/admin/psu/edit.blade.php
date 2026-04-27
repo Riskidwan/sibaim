@@ -56,7 +56,7 @@
                                     <label for="file_ba_terbit" class="form-label">Update File BA Terima (PDF/Gambar)</label>
                                     <input type="file" name="file_ba_terbit" id="file_ba_terbit" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
                                     @if($submission->file_ba_terbit)
-                                        <div class="mt-1 small text-muted">File saat ini: <a href="{{ asset('storage/' . $submission->file_ba_terbit) }}" target="_blank">Lihat Berkas</a></div>
+                                        <div class="mt-1 small text-muted">File saat ini: <a href="{{ route('psu.file.serve', ['submission' => $submission->id, 'field' => 'file_ba_terbit']) }}" target="_blank">Lihat Berkas</a></div>
                                     @endif
                                 </div>
                             </div>
@@ -81,8 +81,15 @@
                                         <label for="{{ $key }}" class="form-label small fw-bold">{{ $label }}</label>
                                         <input type="file" name="{{ $key }}" id="{{ $key }}" class="form-control form-control-sm">
                                         @if($submission->$key)
-                                            <div class="mt-1 x-small">
-                                                <a href="{{ asset('storage/' . $submission->$key) }}" target="_blank" class="text-info"><i class="bi bi-file-earmark-check"></i> Lihat Berkas Saat Ini</a>
+                                            <div class="mt-1 d-flex align-items-center justify-content-between" id="file-container-{{ $key }}">
+                                                <a href="{{ route('psu.file.serve', ['submission' => $submission->id, 'field' => $key]) }}" target="_blank" class="text-info small"><i class="bi bi-file-earmark-check"></i> Lihat Berkas Saat Ini</a>
+                                                <button type="button" class="btn btn-link text-danger p-0 ms-2" onclick="markFileForDeletion('{{ $key }}', '{{ $label }}')" title="Tolak/Hapus Berkas ini">
+                                                    <i class="bi bi-x-circle-fill"></i>
+                                                </button>
+                                                <input type="hidden" name="delete_files[]" id="delete-input-{{ $key }}" value="" disabled>
+                                            </div>
+                                            <div id="status-{{ $key }}" class="mt-1 small text-danger fw-bold" style="display: none;">
+                                                <i class="bi bi-trash"></i> Akan dihapus (User harus upload ulang)
                                             </div>
                                         @endif
                                     </div>
@@ -112,6 +119,16 @@
         noteSection.style.display = (this.value === 'perbaikan dokumen') ? 'block' : 'none';
         baSection.style.display = (this.value === 'BA terima terbit') ? 'block' : 'none';
     });
+
+    function markFileForDeletion(key, label) {
+        if (confirm(`Apakah Anda yakin ingin menolak berkas ${label}? File akan dihapus dan user wajib upload ulang.`)) {
+            document.getElementById('file-container-' + key).style.display = 'none';
+            document.getElementById('status-' + key).style.display = 'block';
+            const input = document.getElementById('delete-input-' + key);
+            input.value = key;
+            input.disabled = false;
+        }
+    }
 </script>
 @endpush
 @endsection

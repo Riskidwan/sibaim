@@ -66,10 +66,17 @@ class ProfileController extends Controller
             ],
         ]);
 
+        // Check if verified via AJAX (used in change_email.blade.php)
+        if (session('registration_email_verified') === $request->email) {
+            $user->update(['email' => $request->email]);
+            session()->forget(['registration_otp', 'registration_email', 'registration_email_verified']);
+            return redirect()->route('user.profile')->with('success', 'Email berhasil diperbarui.');
+        }
+
+        // Fallback for old flow or manual access
         // Generate OTP
         $otp = sprintf("%06d", mt_rand(1, 999999));
         
-        // Store technical details in session
         session([
             'account_update_type' => 'email',
             'pending_email' => $request->email,
@@ -77,7 +84,6 @@ class ProfileController extends Controller
             'account_update_otp_expires_at' => Carbon::now()->addMinutes(10),
         ]);
 
-        // Send OTP to Current Email for security
         Mail::to($user->email)->send(new SendOtpMail($otp));
 
         return redirect()->route('user.account.verify-otp')->with('status', 'Kode OTP telah dikirim ke email lama Anda untuk konfirmasi pergantian email.');

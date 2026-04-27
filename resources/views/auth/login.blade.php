@@ -6,6 +6,7 @@
   <title>Masuk — SIBAIM</title>
   <link rel="icon" href="{{ asset('img/logoKab.Pemalang.png') }}" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -164,6 +165,7 @@
     }
     .btn-submit:hover { opacity: 0.92; transform: translateY(-1px); box-shadow: 0 10px 28px rgba(18,81,197,0.4); }
     .btn-submit:active { transform: translateY(0); }
+    .btn-submit:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; }
 
     .sep { display:flex; align-items:center; gap:12px; margin: 16px 0; color: var(--text-muted); font-size: 12px; }
     .sep::before,.sep::after { content:''; flex:1; height:1px; background: var(--border); }
@@ -177,11 +179,58 @@
     }
     .btn-google:hover { border-color: var(--blue-light); box-shadow: 0 2px 12px rgba(46,111,245,0.1); }
 
-    .terms { font-size: 12px; color: var(--text-muted); margin-top: 12px; line-height: 1.65; }
-    .terms a { color: var(--blue-main); text-decoration:none; font-weight:600; }
-
     .alert-err { background: #fff1f2; border: 1.5px solid #fecdd3; color: #9f1239; border-radius: 10px; padding: 10px 14px; font-size: 13px; margin-bottom: 16px; }
+    .alert-success { background: #f0fdf4; border: 1.5px solid #bbf7d0; color: #15803d; border-radius: 10px; padding: 10px 14px; font-size: 13px; margin-bottom: 16px; }
 
+    .btn-inline-verify {
+      background: var(--blue-main);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0 15px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      height: 42px;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .btn-inline-verify:hover { background: var(--blue-light); }
+    .btn-inline-verify:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+    #otp-section {
+      background: #f8fafc;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 10px;
+      display: none;
+      animation: slideDown 0.3s ease-out;
+    }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .verify-status { font-size: 11px; font-weight: 700; margin-top: 5px; display: none; }
+    .verify-status.success { color: #059669; }
+    .verify-status.error { color: #dc2626; }
+    
+    .password-wrapper { position: relative; width: 100%; }
+    .toggle-password {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: var(--text-muted);
+      z-index: 10;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+    .toggle-password:hover { color: var(--blue-main); }
+    
+    .back-link { text-align: center; margin-top: 24px; }
+    .back-link a { color: var(--text-muted); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+    .back-link a:hover { color: var(--blue-main); }
+    
     @media (max-width: 740px) {
       .card-wrap { flex-direction: column-reverse; width:95vw; min-height:unset; }
       .logo-panel { width:100%; padding:36px 24px; }
@@ -237,18 +286,25 @@
         <div class="alert-err">{{ session('error') }}</div>
       @endif
 
+      @if (session('success'))
+        <div class="alert-success">{{ session('success') }}</div>
+      @endif
+
       <form method="POST" action="{{ route('login') }}">
         @csrf
 
         <div class="input-group">
-          <label>Alamat Email</label>
-          <input type="email" name="email" value="{{ old('email') }}" placeholder="nama@email.com" required autofocus/>
+          <label>ALAMAT EMAIL</label>
+          <input type="email" name="email" value="{{ old('email') }}" placeholder="admin@gmail.com" required autofocus/>
           @error('email')<span style="color:#e11d48;font-size:12px;margin-top:4px;display:block">{{ $message }}</span>@enderror
         </div>
 
         <div class="input-group">
-          <label>Kata Sandi</label>
-          <input type="password" name="password" placeholder="Masukkan kata sandi" required/>
+          <label>KATA SANDI</label>
+          <div class="password-wrapper">
+            <input type="password" name="password" id="login-password" placeholder="••••••••" required/>
+            <i class="fas fa-eye toggle-password" onclick="togglePassword('login-password', this)"></i>
+          </div>
           @error('password')<span style="color:#e11d48;font-size:12px;margin-top:4px;display:block">{{ $message }}</span>@enderror
         </div>
 
@@ -266,18 +322,6 @@
 
         <button type="submit" class="btn-submit">Masuk ke Portal PSU</button>
       </form>
-
-      <div class="sep">atau</div>
-
-    <a href="{{ route('redirect.google') }}" class="btn-google">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
-          <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
-          <path d="M3.964 10.71C3.784 10.17 3.68 9.593 3.68 9c0-.593.104-1.17.284-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-          <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-        </svg>
-        Masuk dengan Akun Google
-      </a>
     </div>
 
     <!-- ══ FORM REGISTER ══ -->
@@ -296,40 +340,54 @@
 
         <div class="input-group">
           <label>Alamat Email</label>
-          <input type="email" name="email" value="{{ old('email') }}" placeholder="nama@email.com" required/>
+          <div style="display: flex; gap: 8px;">
+            <div style="flex: 1;">
+              <input type="email" id="reg-email" name="email" value="{{ old('email') }}" placeholder="nama@email.com" required/>
+            </div>
+            <button type="button" id="btn-send-otp" class="btn-inline-verify">Verifikasi</button>
+          </div>
+          <div id="verify-email-status" class="verify-status"></div>
           @error('email')<span style="color:#e11d48;font-size:12px;margin-top:4px;display:block">{{ $message }}</span>@enderror
+        </div>
+
+        <!-- OTP SECTION (HIDDEN BY DEFAULT) -->
+        <div id="otp-section">
+          <label>Masukan Kode OTP</label>
+          <p style="font-size: 11px; color: #64748b; margin-bottom: 10px;">Kode telah dikirim ke email Anda. Periksa kotak masuk/spam.</p>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="reg-otp" maxlength="6" placeholder="000000" style="text-align: center; font-weight: 800; letter-spacing: 4px;"/>
+            <button type="button" id="btn-check-otp" class="btn-inline-verify">Cek Kode</button>
+          </div>
+          <div id="verify-otp-status" class="verify-status"></div>
         </div>
 
         <div class="input-row">
           <div class="input-group">
             <label>Kata Sandi</label>
-            <input type="password" name="password" placeholder="Min. 8 karakter" required/>
+            <div class="password-wrapper">
+              <input type="password" name="password" id="reg-password" placeholder="Min. 8 karakter" required/>
+              <i class="fas fa-eye toggle-password" onclick="togglePassword('reg-password', this)"></i>
+            </div>
             @error('password')<span style="color:#e11d48;font-size:12px;margin-top:4px;display:block">{{ $message }}</span>@enderror
           </div>
           <div class="input-group">
             <label>Konfirmasi Sandi</label>
-            <input type="password" name="password_confirmation" placeholder="Ulangi sandi" required/>
+            <div class="password-wrapper">
+              <input type="password" name="password_confirmation" id="reg-password-confirm" placeholder="Ulangi sandi" required/>
+              <i class="fas fa-eye toggle-password" onclick="togglePassword('reg-password-confirm', this)"></i>
+            </div>
           </div>
         </div>
 
-        <button type="submit" class="btn-submit" style="margin-top:6px;">Daftarkan Akun</button>
+        <button type="submit" id="btn-register-submit" class="btn-submit" style="margin-top:6px;" disabled>Daftarkan Akun</button>
       </form>
-
-      <div class="sep">atau</div>
-
-      <a href="{{ route('redirect.google') }}" class="btn-google">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
-          <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
-          <path d="M3.964 10.71C3.784 10.17 3.68 9.593 3.68 9c0-.593.104-1.17.284-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-          <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-        </svg>
-        Daftar dengan Akun Google
-      </a>
-
-      <p class="terms">
+      <p class="terms" style="margin-top: 15px; font-size: 11px; color: var(--text-muted); text-align: center;">
         Dengan mendaftar, Anda menyetujui Syarat & Ketentuan serta Kebijakan Privasi sistem.
       </p>
+    </div>
+
+    <div class="back-link">
+      <a href="/">← Kembali ke Beranda</a>
     </div>
 
   </div>
@@ -350,6 +408,128 @@
       .find(b => b.textContent.trim() === labels[tab])
       ?.classList.add('active');
     document.getElementById(tab + '-view').classList.add('active');
+  }
+
+  // INLINE OTP LOGIC
+  document.addEventListener('DOMContentLoaded', function() {
+    const btnSendOtp = document.getElementById('btn-send-otp');
+    const btnCheckOtp = document.getElementById('btn-check-otp');
+    const emailInput = document.getElementById('reg-email');
+    const otpInput = document.getElementById('reg-otp');
+    const otpSection = document.getElementById('otp-section');
+    const submitBtn = document.getElementById('btn-register-submit');
+    
+    const emailStatus = document.getElementById('verify-email-status');
+    const otpStatus = document.getElementById('verify-otp-status');
+
+    let isEmailVerified = false;
+
+    btnSendOtp.addEventListener('click', async function() {
+      const email = emailInput.value;
+      if(!email || !email.includes('@')) {
+        alert('Silakan masukkan email yang valid.');
+        return;
+      }
+
+      btnSendOtp.disabled = true;
+      btnSendOtp.innerText = 'Mengirim...';
+      emailStatus.style.display = 'none';
+
+      try {
+        const response = await fetch('{{ route("auth.send-otp-registration") }}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+          },
+          body: JSON.stringify({ email: email })
+        });
+
+        const data = await response.json();
+        if(data.success) {
+          otpSection.style.display = 'block';
+          emailStatus.innerText = 'Kode OTP terkirim!';
+          emailStatus.className = 'verify-status success';
+          emailStatus.style.display = 'block';
+          btnSendOtp.innerText = 'Kirim Ulang';
+          btnSendOtp.disabled = false;
+        } else {
+          emailStatus.innerText = data.message || 'Gagal mengirim OTP.';
+          emailStatus.className = 'verify-status error';
+          emailStatus.style.display = 'block';
+          btnSendOtp.disabled = false;
+          btnSendOtp.innerText = 'Verifikasi';
+        }
+      } catch (error) {
+        alert('Terjadi kesalahan koneksi.');
+        btnSendOtp.disabled = false;
+        btnSendOtp.innerText = 'Verifikasi';
+      }
+    });
+
+    btnCheckOtp.addEventListener('click', async function() {
+      const otp = otpInput.value;
+      const email = emailInput.value;
+      if(!otp || otp.length < 6) {
+        alert('Masukkan 6 digit kode OTP.');
+        return;
+      }
+
+      btnCheckOtp.disabled = true;
+      btnCheckOtp.innerText = 'Checking...';
+
+      try {
+        const response = await fetch('{{ route("auth.verify-otp-registration") }}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+          },
+          body: JSON.stringify({ email: email, otp: otp })
+        });
+
+        const data = await response.json();
+        if(data.success) {
+          otpStatus.innerText = 'Email berhasil diverifikasi!';
+          otpStatus.className = 'verify-status success';
+          otpStatus.style.display = 'block';
+          
+          // Disable email and otp inputs
+          emailInput.readOnly = true;
+          otpInput.readOnly = true;
+          btnSendOtp.style.display = 'none';
+          btnCheckOtp.disabled = true;
+          btnCheckOtp.innerText = 'Selesai';
+          
+          // Enable register button
+          submitBtn.disabled = false;
+          isEmailVerified = true;
+        } else {
+          otpStatus.innerText = data.message || 'Kode OTP salah.';
+          otpStatus.className = 'verify-status error';
+          otpStatus.style.display = 'block';
+          btnCheckOtp.disabled = false;
+          btnCheckOtp.innerText = 'Cek Kode';
+        }
+      } catch (error) {
+        alert('Terjadi kesalahan koneksi.');
+        btnCheckOtp.disabled = false;
+        btnCheckOtp.innerText = 'Cek Kode';
+      }
+    });
+  });
+
+  function togglePassword(inputId, icon) {
+    const input = document.getElementById(inputId);
+    if (input.type === "password") {
+      input.type = "text";
+      icon.classList.remove("fa-eye");
+      icon.classList.add("fa-eye-slash");
+    } else {
+      input.type = "password";
+      icon.classList.remove("fa-eye-slash");
+      icon.classList.add("fa-eye");
+    }
   }
 </script>
 

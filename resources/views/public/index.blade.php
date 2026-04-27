@@ -70,31 +70,27 @@
 
     <div class="row text-center justify-content-center g-4">
       
-      <div class="col-lg-3 col-md-6">
+      <div class="col-lg-4 col-md-6">
         <div class="p-4 shadow-sm rounded bg-light border-top border-primary border-4 h-100">
+         <p class="mb-0 text-muted text-uppercase fw-semibold small">Sudah Serah Terima</p>
           <h2 class="display-5 fw-bold text-primary">{{ $totalPsuSubmissions }}</h2>
-          <p class="mb-0 text-muted text-uppercase fw-semibold small">Sudah Serah Terima</p>
+         
         </div>
       </div>
 
-      <div class="col-lg-3 col-md-6">
+      <div class="col-lg-4 col-md-6">
         <div class="p-4 shadow-sm rounded bg-light border-top border-warning border-4 h-100">
+        <p class="mb-0 text-muted text-uppercase fw-semibold small">Belum Serah Terima</p>
           <h2 class="display-5 fw-bold text-warning">{{ $totalPsuNotYet }}</h2>
-          <p class="mb-0 text-muted text-uppercase fw-semibold small">Belum Serah Terima</p>
+  
         </div>
       </div>
 
-      <div class="col-lg-3 col-md-6">
+      <div class="col-lg-4 col-md-6">
         <div class="p-4 shadow-sm rounded bg-light border-top border-success border-4 h-100">
+               <p class="mb-0 text-muted text-uppercase fw-semibold small">Total Perumahan</p>
           <h2 class="display-5 fw-bold text-success">{{ $totalHousings }}</h2>
-          <p class="mb-0 text-muted text-uppercase fw-semibold small">Total Perumahan</p>
-        </div>
-      </div>
-
-      <div class="col-lg-3 col-md-6">
-        <div class="p-4 shadow-sm rounded bg-light border-top border-info border-4 h-100">
-          <h2 class="display-5 fw-bold text-info">{{ $totalJalans }}</h2>
-          <p class="mb-0 text-muted text-uppercase fw-semibold small">Total Data Jalan</p>
+   
         </div>
       </div>
 

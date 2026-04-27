@@ -6,7 +6,6 @@ use App\Http\Controllers\PsuSubmissionController;
     
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MasterDataController;
-use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\User\DashboardController as UserDashboardController;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,21 +18,26 @@ Route::get('/galeri/{category?}', [PageController::class, 'galeri'])->name('publ
 Route::get('/data-perumahan', [PageController::class, 'dataPerumahan'])->name('public.psu-housing');
 Route::get('/data-jalan', [PageController::class, 'dataJalan'])->name('public.data-jalan');
 
+// Secure File Access (Accessed by both User and Admin)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/psu-file/{submission}/{field}', [App\Http\Controllers\FileAccessController::class, 'servePsuFile'])->name('psu.file.serve');
+});
+
+// Admin Authentication Routes
+Route::get('/admin/login', [App\Http\Controllers\Auth\AdminLoginController::class, 'showLoginForm'])->name('admin.login');
+Route::post('/admin/login', [App\Http\Controllers\Auth\AdminLoginController::class, 'login'])->middleware('throttle:5,1');
+Route::post('/admin/logout', [App\Http\Controllers\Auth\AdminLoginController::class, 'logout'])->name('admin.logout');
+
 // Authentication Routes
 Auth::routes();
 
-// Google Socialite Routes
-Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('redirect.google');
-Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
+// Pre-registration OTP Verification
+Route::post('/auth/send-otp-registration', [App\Http\Controllers\Auth\RegisterController::class, 'sendOtpRegistration'])->name('auth.send-otp-registration')->middleware('throttle:3,1');
+Route::post('/auth/verify-otp-registration', [App\Http\Controllers\Auth\RegisterController::class, 'verifyOtpRegistration'])->name('auth.verify-otp-registration')->middleware('throttle:5,1');
 
 // Authenticated User Routes (PSU Submission & Dashboard)
-Route::middleware(['auth', 'verified.custom'])->group(function () {
+Route::middleware(['auth', 'role:user', 'verified.custom'])->group(function () {
     Route::get('/user/dashboard', [UserDashboardController::class, 'index'])->name('user.dashboard');
-    
-    // OTP Verification Routes
-    Route::get('/auth/verify-otp', [App\Http\Controllers\Auth\VerificationController::class, 'showOtpForm'])->name('auth.verify-otp');
-    Route::post('/auth/verify-otp', [App\Http\Controllers\Auth\VerificationController::class, 'verifyOtp'])->name('auth.verify-otp.post');
-    Route::post('/auth/resend-otp', [App\Http\Controllers\Auth\VerificationController::class, 'resendOtp'])->name('auth.resend-otp');
     
     // PSU Submission Routes for authenticated users
     Route::get('/permohonan-psu', [PsuSubmissionController::class, 'index']);
@@ -93,6 +97,14 @@ Route::middleware(['auth', 'role:superadmin,kepala', 'verified.custom'])->prefix
             Route::delete('housing-conditions/{id}', [MasterDataController::class, 'psuConditionDestroy'])->name('housing-conditions.destroy');
         });
     });
+
+    // Profile Management with OTP
+    Route::get('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('admin.profile');
+    Route::put('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'updateProfile'])->name('admin.profile.update');
+    Route::put('/profile/email', [App\Http\Controllers\Admin\ProfileController::class, 'updateEmail'])->name('admin.profile.email.update');
+    Route::put('/profile/password', [App\Http\Controllers\Admin\ProfileController::class, 'updatePassword'])->name('admin.profile.password.update');
+    Route::get('/profile/verify-otp', [App\Http\Controllers\Admin\ProfileController::class, 'showVerifyOtpForm'])->name('admin.profile.verify-otp');
+    Route::post('/profile/verify-otp', [App\Http\Controllers\Admin\ProfileController::class, 'verifyUpdate'])->name('admin.profile.verify-otp.post');
 });
 
 

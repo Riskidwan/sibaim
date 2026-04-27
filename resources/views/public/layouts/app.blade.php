@@ -26,93 +26,37 @@
     @stack('styles')
 
     <style>
-      .navbar {
-        background-color: #ffff00 !important;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+      /* ── Shared Navbar & Dashboard Style (Yellow Theme) ── */
+      .navbar, .navbar-dashboard {
+        background-color: #ffff00 !important; /* Brand Yellow */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        border-bottom: 3px solid #115e59 !important; /* Brand Contrast Line */
+        transition: all 0.3s ease;
+        padding: 10px 0 !important;
       }
-      .navbar .nav-link {
+      
+      .navbar .nav-link, .navbar-dashboard .nav-dashboard-link {
+        color: #115e59 !important; /* Professional Dark Teal */
+        font-weight: 700 !important;
+        padding: 10px 8px !important;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      
+      .navbar .nav-link:hover, .navbar-dashboard .nav-dashboard-link:hover {
         color: #000000 !important;
-        font-weight: 600 !important;
+        transform: translateY(-1px);
       }
-      .navbar .navbar-brand {
-        color: #000000 !important;
-      }
-      .navbar .navbar-toggler-icon {
-        filter: brightness(0);
-      }
-      .btn-navbar-login {
-        background-color: #115e59 !important;
-        color: #ffffff !important;
-        border-radius: 50px !important;
-        padding: 8px 24px !important;
-        font-weight: 600 !important;
-        border: none !important;
-        transition: 0.3s !important;
-      }
-      .btn-navbar-login:hover {
-        background-color: #0d403d !important;
-        transform: scale(1.05);
-      }
-      /* ── Mobile Navbar Dark Override ── */
-      @media (max-width: 991.98px) {
-        /* Background menu mobile */
-        .navbar-collapse {
-          background: #111827 !important;
-          border-radius: 12px;
-          margin-top: 8px;
-          padding: 8px 12px 12px;
-        }
-        /* Link teks */
-        .navbar-nav .nav-link {
-          color: #d1d5db !important;
-        }
-        .navbar-nav .nav-link:hover,
-        .navbar-nav .nav-link:focus {
-          color: #ffffff !important;
-        }
-        /* Dropdown menu di dalam mobile */
-        .navbar-nav .dropdown-menu {
-          background: #1f2937 !important;
-          border: 1px solid #374151 !important;
-          border-radius: 10px;
-        }
-        .navbar-nav .dropdown-menu .dropdown-item {
-          color: #d1d5db !important;
-        }
-        .navbar-nav .dropdown-menu .dropdown-item:hover {
-          background: #374151 !important;
-          color: #ffffff !important;
-        }
-        .navbar-nav .dropdown-menu .dropdown-header {
-          color: #6b7280 !important;
-        }
-        .navbar-nav .dropdown-menu hr.dropdown-divider {
-          border-color: #374151 !important;
-        }
-        /* Sub-dropdown juga */
-        .dropdown-submenu .dropdown-menu {
-          background: #1f2937 !important;
-          border: 1px solid #374151 !important;
-        }
-      }
-    </style>
-  </head>
 
-  <body>
-    <style>
-      /* ── Dashboard Navbar (SIMBG Style - Refined) ── */
-      .navbar-dashboard {
-        background-color: #ffff00 !important;
-        padding: 8px 0 !important;
-        box-shadow: 0 1px 15px rgba(0, 0, 0, 0.08) !important;
-        border-bottom: 3px solid #115e59;
+      .navbar .navbar-brand, .navbar-dashboard .navbar-brand {
+        color: #115e59 !important;
+        font-weight: 800 !important;
+        display: flex;
+        align-items: center;
       }
-      .navbar-dashboard .navbar-brand {
-        color: #000000 !important;
-        font-size: 1.35rem;
-        font-weight: 800;
-        letter-spacing: -0.5px;
-      }
+
       .navbar-dashboard .brand-subtitle {
         font-size: 0.65rem;
         font-weight: 700;
@@ -124,126 +68,171 @@
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
+
+      .navbar .navbar-toggler {
+        border-color: #115e59 !important;
+        padding: 4px 8px;
+        color: #115e59 !important;
+      }
+      
+      .navbar .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(17, 94, 89, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+      }
+
+      .btn-navbar-login {
+        background-color: #115e59 !important;
+        color: #ffffff !important;
+        border-radius: 50px !important;
+        padding: 8px 24px !important;
+        font-weight: 700 !important;
+        border: none !important;
+        transition: 0.3s !important;
+      }
+      
+      .btn-navbar-login:hover {
+        background-color: #0d403d !important;
+        transform: scale(1.05);
+      }
+
       .btn-beranda-simbg {
         background: #115e59 !important;
         color: white !important;
         border-radius: 8px !important;
-        padding: 6px 18px !important; /* Smaller padding */
+        padding: 8px 15px !important;
         font-weight: 700 !important;
         text-decoration: none !important;
         font-size: 0.9rem !important;
-        margin-left: 20px;
+        margin-left: 15px;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         display: flex;
         align-items: center;
         gap: 8px;
       }
-      .btn-beranda-simbg:hover { 
-        background: #0d403d !important; 
-        box-shadow: 0 4px 6px rgba(17, 94, 89, 0.3);
-        transform: translateY(-1px); 
-      }
-      
-      .nav-dashboard-link {
-        color: #000000 !important;
-        font-weight: 700 !important;
-        font-size: 0.95rem !important;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 8px 15px !important;
-        transition: all 0.2s;
-        border-radius: 8px;
-      }
-      .nav-dashboard-link:hover { background: rgba(0,0,0,0.04); color: #115e59 !important; }
-      .nav-dashboard-link i { font-size: 1.2rem; }
 
-      /* User Dropdown Refinement */
-      .user-dropdown-simbg {
-        background: white !important;
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 14px !important;
-        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04) !important;
-        padding: 8px !important;
-        min-width: 240px !important;
-        margin-top: 18px !important;
-      }
-      .user-dropdown-simbg .dropdown-item {
-        padding: 11px 18px !important;
-        border-radius: 10px !important;
-        font-weight: 600 !important;
-        color: #475569 !important;
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        font-size: 0.9rem;
-      }
-      .user-dropdown-simbg .dropdown-item:hover { 
-        background: #f1f5f9 !important; 
-        color: #115e59 !important; 
-      }
-      .user-dropdown-simbg .dropdown-item i { 
-        width: 20px; 
-        color: #64748b; 
-        font-size: 1.1rem;
-        display: flex;
-        justify-content: center;
-      }
-      .user-dropdown-simbg .dropdown-divider { margin: 8px 10px !important; opacity: 0.1; }
-
-      .navbar-dashboard .navbar-toggler { border: none !important; color: #115e59 !important; padding: 0; }
-      .navbar-dashboard .navbar-toggler:focus { box-shadow: none !important; }
-
+      /* ── Mobile Navbar Correction ── */
       @media (max-width: 991.98px) {
-        .navbar-dashboard .navbar-collapse { background: #ffff00 !important; padding: 25px; margin-top: 20px; border-radius: 16px; border: 2px solid #115e59; }
+        .navbar-collapse {
+          background: #ffff00 !important; /* Keep it yellow */
+          border-radius: 16px;
+          margin-top: 15px;
+          padding: 25px;
+          border: 3px solid #115e59 !important;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .navbar-nav .nav-link, .navbar-dashboard .navbar-nav .nav-link {
+          color: #115e59 !important; /* High contrast dark teal text */
+          padding: 15px !important;
+          border-bottom: 1px solid rgba(17, 94, 89, 0.1);
+          font-weight: 800 !important;
+          font-size: 1.05rem !important;
+        }
+
+        .navbar-nav .nav-link:last-child {
+          border-bottom: none;
+        }
+        
+        .navbar-nav .nav-link:hover {
+          background: rgba(17, 94, 89, 0.05);
+          color: #000000 !important;
+        }
+
+        .navbar-nav .dropdown-menu {
+          background: rgba(17, 94, 89, 0.05) !important;
+          border: none !important;
+          border-radius: 10px;
+          padding: 10px 0 10px 20px;
+        }
+
+        .navbar-nav .dropdown-item {
+          color: #115e59 !important;
+          font-weight: 700;
+          padding: 10px 15px !important;
+        }
+
         .btn-beranda-simbg { margin-left: 0; margin-bottom: 20px; width: 100%; justify-content: center; }
       }
 
-      /* Notification Dropdown Popover Style */
-      .notification-dropdown {
-        width: 320px !important;
+      /* User & Notification Dropdowns */
+      .user-dropdown-simbg, .notification-dropdown {
+        background: white !important;
         border: none !important;
-        border-radius: 12px !important;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04) !important;
         padding: 0 !important;
-        margin-top: 15px !important;
-        overflow: visible !important;
+        overflow: hidden;
       }
-      .notification-dropdown::before {
-        content: "";
-        position: absolute;
-        top: -8px;
-        left: 20px;
-        width: 16px;
-        height: 16px;
-        background: white;
-        transform: rotate(45deg);
-        z-index: -1;
-      }
-      .notification-header {
-        padding: 12px 16px;
-        border-bottom: 1px solid #f1f5f9;
-        font-weight: 700;
-        font-size: 0.85rem;
-        color: #334155;
-      }
-      .notification-footer {
-        padding: 10px;
-        text-align: center;
-        border-top: 1px solid #f1f5f9;
+      
+      .notification-dropdown { width: 340px !important; border: 1px solid #f1f5f9 !important; }
+
+      .notification-header { 
+        padding: 16px 20px; 
         background: #f8fafc;
-        border-bottom-left-radius: 12px;
-        border-bottom-right-radius: 12px;
+        border-bottom: 1px solid #f1f5f9; 
+        font-weight: 800; 
+        color: #115e59;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
       }
-      .notification-item {
-        padding: 12px 16px !important;
-        border-bottom: 1px solid #f8fafc;
-        transition: all 0.2s;
-        white-space: normal !important;
+
+      .notification-body::-webkit-scrollbar { width: 6px; }
+      .notification-body::-webkit-scrollbar-track { background: #f1f5f9; }
+      .notification-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+      .notification-body::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+      .notification-item { 
+        padding: 16px 20px !important; 
+        border-bottom: 1px solid #f1f5f9; 
+        transition: all 0.2s; 
+        white-space: normal !important; 
+        position: relative;
       }
-      .notification-item:hover { background: #f1f5f9 !important; }
-      .notification-item.unread { background: #eff6ff; }
       .notification-item:last-child { border-bottom: none; }
+      .notification-item:hover { background: #f8fafc !important; }
+      .notification-item.unread { background: #f0fdfa !important; }
+      .notification-item.unread:hover { background: #ecfdf5 !important; }
+      
+      .notification-footer {
+        padding: 12px;
+        text-align: center;
+        background: #f8fafc;
+        border-top: 1px solid #f1f5f9;
+      }
+      .notification-footer a {
+        display: block;
+        color: #115e59;
+        font-size: 0.8rem;
+        transition: all 0.2s;
+      }
+      .notification-footer a:hover { color: #0d403d; transform: scale(1.02); }
+
+      /* Modal Login Styles */
+      .login-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid transparent !important;
+      }
+      .login-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+      }
+      
+      .login-option {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid transparent !important;
+        cursor: pointer;
+      }
+      .login-option:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 20px rgba(0,0,0,0.08);
+      }
+      .login-option.pemohon:hover {
+        background-color: #e0f2f1 !important;
+        border-color: #115e59 !important;
+      }
+      .login-option.admin:hover {
+        background-color: #fee2e2 !important;
+        border-color: #dc3545 !important;
+      }
     </style>
   </head>
 
@@ -256,7 +245,7 @@
     @if($isUserDashboard)
       <!-- DASHBOARD NAVBAR (SIMBG LAYOUT - REFINED) -->
       <nav class="navbar navbar-expand-lg navbar-dashboard fixed-top">
-        <div class="container">
+        <div class="container-fluid px-lg-1">
           <div class="d-flex align-items-center">
             <a class="navbar-brand d-flex align-items-center fw-bold" href="{{ url('/') }}">
               <img src="{{ asset('img/logoKab.Pemalang.png') }}" width="34" class="me-2" alt="Logo">
@@ -265,11 +254,6 @@
             <div class="brand-subtitle d-none d-md-block">
               SISTEM INFORMASI BASIS DATA<br>KAWASAN PERMUKIMAN
             </div>
-            <!-- Custom Beranda Button with Logout Logic -->
-            <a href="{{ url('/') }}" class="btn-beranda-simbg d-none d-lg-flex" 
-               onclick="event.preventDefault(); if(confirm('Apakah Anda ingin keluar dan kembali ke Beranda?')) document.getElementById('logout-form').submit();">
-              <i class="fas fa-home"></i> Beranda
-            </a>
           </div>
 
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#dashboardNav">
@@ -277,6 +261,16 @@
           </button>
 
           <div class="collapse navbar-collapse" id="dashboardNav">
+            <!-- Left Side Navbar -->
+            <ul class="navbar-nav me-auto align-items-center">
+              <li class="nav-item d-flex align-items-center gap-2">
+                <a href="{{ route('user.dashboard') }}" class="btn-beranda-simbg" style="background: #115e59 !important;">
+                  <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+              </li>
+            </ul>
+
+            <!-- Right Side Navbar -->
             <ul class="navbar-nav ms-auto align-items-center">
               <li class="nav-item dropdown">
                 <a class="nav-dashboard-link position-relative dropdown-toggle" href="#" id="notifDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -287,47 +281,69 @@
                     $recentNotifications = auth()->user()->notifications()->take(5)->get();
                   @endphp
                   @if($unreadCount > 0)
-                    <span class="position-absolute top-10 start-90 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem; padding: 0.35em 0.65em;">
+                    <span class="position-absolute translate-middle badge rounded-pill bg-danger" style="top: 8px; left: 18px; font-size: 0.55rem; padding: 0.4em 0.6em; border: 2px solid #ffff00;">
                       {{ $unreadCount > 99 ? '99+' : $unreadCount }}
                     </span>
                   @endif
                 </a>
-                <div class="dropdown-menu dropdown-menu-start notification-dropdown animate slideIn" aria-labelledby="notifDropdown">
+                <div class="dropdown-menu dropdown-menu-end notification-dropdown animate slideIn" aria-labelledby="notifDropdown">
                   <div class="notification-header d-flex justify-content-between align-items-center">
-                    <span>PEMBERITAHUAN</span>
+                    <div class="d-flex align-items-center gap-2">
+                      <i class="fas fa-bell text-primary"></i>
+                      <span>PEMBERITAHUAN</span>
+                    </div>
                     @if($unreadCount > 0)
-                      <span class="badge bg-primary-subtle text-primary rounded-pill" style="font-size: 0.7rem;">{{ $unreadCount }} Baru</span>
+                      <span class="badge bg-danger rounded-pill" style="font-size: 0.65rem;">{{ $unreadCount }} Baru</span>
                     @endif
                   </div>
-                  <div class="notification-body" style="max-height: 350px; overflow-y: auto;">
+                  <div class="notification-body" style="max-height: 400px; overflow-y: auto;">
                     @forelse($recentNotifications as $notification)
                       <a href="{{ route('user.notifications.index') }}" class="dropdown-item notification-item {{ $notification->unread() ? 'unread' : '' }}">
-                        <div class="d-flex align-items-start">
+                        <div class="d-flex align-items-start gap-3">
+                          <div class="flex-shrink-0 mt-1">
+                            @if(isset($notification->data['type']) && $notification->data['type'] == 'status')
+                              <div class="bg-info-subtle text-info rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                <i class="fas fa-info-circle fs-6"></i>
+                              </div>
+                            @else
+                              <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                <i class="fas fa-file-alt fs-6"></i>
+                              </div>
+                            @endif
+                          </div>
                           <div class="flex-grow-1">
-                            <div class="fw-bold text-dark small mb-1">Pembaruan Status</div>
-                            <div class="text-muted" style="font-size: 0.75rem; line-height: 1.4;">
-                                {{ \Illuminate\Support\Str::limit($notification->data['message'], 60) }}
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                              <span class="fw-bold text-dark" style="font-size: 0.85rem;">
+                                {{ $notification->data['title'] ?? 'Pembaruan Sistem' }}
+                              </span>
+                              @if($notification->unread())
+                                <span class="bg-primary rounded-circle" style="width: 6px; height: 6px;"></span>
+                              @endif
                             </div>
-                            <div class="text-primary mt-1 fw-bold" style="font-size: 0.65rem;">
-                              <i class="far fa-clock me-1"></i> {{ $notification->created_at->diffForHumans() }}
+                            <div class="text-muted" style="font-size: 0.8rem; line-height: 1.5; color: #64748b !important;">
+                                {{ \Illuminate\Support\Str::limit($notification->data['message'], 80) }}
+                            </div>
+                            <div class="d-flex align-items-center gap-2 mt-2 text-secondary" style="font-size: 0.7rem;">
+                              <i class="far fa-clock"></i>
+                              <span>{{ $notification->created_at->diffForHumans() }}</span>
                             </div>
                           </div>
-                          @if($notification->unread())
-                            <div class="ms-2">
-                              <span class="bg-primary rounded-circle d-block" style="width: 8px; height: 8px;"></span>
-                            </div>
-                          @endif
                         </div>
                       </a>
                     @empty
-                      <div class="py-5 text-center px-3">
-                        <i class="fas fa-bell-slash text-muted mb-2 fs-3" style="opacity: 0.3;"></i>
-                        <p class="text-muted small mb-0">Belum ada pemberitahuan</p>
+                      <div class="py-5 text-center px-4">
+                        <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                          <i class="fas fa-bell-slash text-muted fs-3" style="opacity: 0.4;"></i>
+                        </div>
+                        <p class="text-dark fw-bold small mb-1">Tidak Ada Notifikasi</p>
+                        <p class="text-muted small mb-0">Semua pemberitahuan sudah Anda baca.</p>
                       </div>
                     @endforelse
                   </div>
                   <div class="notification-footer">
-                    <a href="{{ route('user.notifications.index') }}" class="text-primary fw-bold text-decoration-none small">Lihat Semua Pemberitahuan</a>
+                    <a href="{{ route('user.notifications.index') }}" class="fw-bold text-decoration-none">
+                      Lihat Semua Pemberitahuan <i class="fas fa-arrow-right ms-1" style="font-size: 0.7rem;"></i>
+                    </a>
                   </div>
                 </div>
               </li>
@@ -348,6 +364,7 @@
                     </div>
                   </div>
                   
+                  <a class="dropdown-item" href="{{ route('user.dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
                   <a class="dropdown-item" href="{{ route('user.profile') }}"><i class="fas fa-user-edit"></i> Profil Saya</a>
                   <a class="dropdown-item" href="{{ route('user.email') }}"><i class="fas fa-envelope-open-text"></i> Ubah E-mail</a>
                   <a class="dropdown-item" href="{{ route('user.password') }}"><i class="fas fa-fingerprint"></i> Ubah Kata Sandi</a>
@@ -370,7 +387,7 @@
       </nav>
     @else
       <nav class="navbar navbar-expand-lg navbar-dashboard fixed-top">
-        <div class="container">
+        <div class="container-fluid px-lg-1">
           <div class="d-flex align-items-center">
             <a class="navbar-brand d-flex align-items-center fw-bold" href="{{ url('/') }}">
               <img src="{{ asset('img/logoKab.Pemalang.png') }}" width="34" class="me-2" alt="Logo">
@@ -401,11 +418,11 @@
 
               <li class="nav-item dropdown" id="navData">
                 <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-                  Data PSU
+                  Data
                 </a>
                 <ul class="dropdown-menu" style="min-width: 230px; padding: 6px;">
                   <li>
-                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="/permohonan-psu">
+                    <a class="dropdown-item d-flex justify-content-between align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">
                       Serah Terima PSU
                     </a>
                   </li>
@@ -440,7 +457,7 @@
 
               @guest
               <li class="nav-item ms-3">
-                <a class="btn btn-navbar-login" href="{{ route('login') }}">Login</a>
+                <a class="btn btn-navbar-login" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a>
               </li>
               @else
               <li class="nav-item dropdown ms-3">
@@ -471,6 +488,40 @@
     @endif
 
     @yield('content')
+    
+    <!-- LOGIN SELECTION MODAL -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" style="max-width: 450px;">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+          <div class="modal-header border-0 pb-0 pt-4 px-4">
+            <h6 class="modal-title fw-bold" style="color: #115e59; letter-spacing: 1px;">PILIH AKSES MASUK</h6>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4">
+            <div class="row g-3">
+              <!-- Opsi Pemohon -->
+              <div class="col-6">
+                <a href="{{ route('login') }}" class="text-decoration-none h-100 d-block">
+                  <div class="login-option pemohon p-4 rounded-4 text-center h-100 d-flex flex-column align-items-center justify-content-center" style="background-color: #f0fdfa;">
+                    <div class="fw-bold mb-1" style="color: #115e59; font-size: 0.9rem;">PEMOHON</div>
+                    <div class="text-muted small fw-normal" style="font-size: 0.7rem;">Pendaftaran PSU</div>
+                  </div>
+                </a>
+              </div>
+              <!-- Opsi Admin -->
+              <div class="col-6">
+                <a href="{{ url('/admin/login') }}" class="text-decoration-none h-100 d-block">
+                  <div class="login-option admin p-4 rounded-4 text-center h-100 d-flex flex-column align-items-center justify-content-center" style="background-color: #fef2f2;">
+                    <div class="fw-bold mb-1" style="color: #dc3545; font-size: 0.9rem;">ADMIN</div>
+                    <div class="text-muted small fw-normal" style="font-size: 0.7rem;">Portal Petugas</div>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- FOOTER -->
     @include('public.layouts.footer')

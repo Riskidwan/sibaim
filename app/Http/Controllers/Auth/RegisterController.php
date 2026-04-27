@@ -36,7 +36,46 @@ class RegisterController extends Controller implements HasMiddleware
      *
      * @var string
      */
-    protected $redirectTo = '/auth/verify-otp';
+    protected $redirectTo = '/user/dashboard';
+
+    public function sendOtpRegistration(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email sudah terdaftar atau format salah.'
+            ]);
+        }
+
+        $otp = sprintf("%06d", mt_rand(1, 999999));
+        session(['registration_otp' => $otp, 'registration_email' => $request->email]);
+
+        try {
+            \Illuminate\Support\Facades\Log::info('Sending OTP to: ' . $request->email . ' | OTP: ' . $otp);
+            Mail::to($request->email)->send(new SendOtpMail($otp));
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send OTP: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Gagal mengirim email. Silakan coba lagi.']);
+        }
+    }
+
+    public function verifyOtpRegistration(Request $request)
+    {
+        $otp = $request->otp;
+        $email = $request->email;
+
+        if ($otp === session('registration_otp') && $email === session('registration_email')) {
+            session(['registration_email_verified' => $email]);
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Kode OTP salah.']);
+    }
 
     /**
      * Create a new controller instance.
@@ -46,7 +85,7 @@ class RegisterController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('guest'),
+            new Middleware('guest', except: ['sendOtpRegistration', 'verifyOtpRegistration']),
         ];
     }
 
@@ -59,7 +98,10 @@ class RegisterController extends Controller implements HasMiddleware
      */
     protected function registered(Request $request, $user)
     {
-        return redirect($this->redirectTo);
+        // Logout user after registration to force manual login
+        \Illuminate\Support\Facades\Auth::logout();
+
+        return redirect('/login')->with('success', 'Pendaftaran berhasil! Akun Anda telah aktif. Silakan masuk menggunakan email dan kata sandi Anda.');
     }
 
     /**
@@ -72,7 +114,17 @@ class RegisterController extends Controller implements HasMiddleware
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => [
+                'required', 
+                'string', 
+                'min:8', 
+                'confirmed',
+                \Illuminate\Validation\Rules\Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols()
+            ],
         ]);
     }
 
@@ -83,18 +135,27 @@ class RegisterController extends Controller implements HasMiddleware
      */
     protected function create(array $data)
     {
-        $otp = sprintf("%06d", mt_rand(1, 999999));
+        $isVerified = session('registration_email_verified') === $data['email'];
 
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'otp_code' => $otp,
-            'otp_expires_at' => Carbon::now()->addMinutes(15),
+            'email_verified_at' => $isVerified ? Carbon::now() : null,
             'role' => User::ROLE_USER,
         ]);
 
-        Mail::to($user->email)->send(new SendOtpMail($otp));
+        if (!$isVerified) {
+            $otp = sprintf("%06d", mt_rand(1, 999999));
+            $user->update([
+                'otp_code' => $otp,
+                'otp_expires_at' => Carbon::now()->addMinutes(15),
+            ]);
+            Mail::to($user->email)->send(new SendOtpMail($otp));
+        } else {
+            // Clear session after success
+            session()->forget(['registration_otp', 'registration_email', 'registration_email_verified']);
+        }
 
         return $user;
     }

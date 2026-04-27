@@ -128,9 +128,11 @@
                                 <div class="col-md-6 mb-4">
                                     <label style="font-weight: 600;">{{ $label }}</label>
                                     @if($submission->$key)
-                                        <span class="current-file"><i class="fas fa-check-circle"></i> File sudah ada</span>
+                                        <span class="current-file text-success fw-bold"><i class="fas fa-check-circle"></i> Berkas Sudah Sesuai</span>
                                     @else
-                                        <span class="current-file" style="color: #e11d48;"><i class="fas fa-times-circle"></i> Belum ada file</span>
+                                        <span class="current-file" style="color: #e11d48; font-weight: 800; font-size: 0.8rem; background: #fff1f2; padding: 4px 8px; border-radius: 6px; display: inline-block; margin-bottom: 10px;">
+                                            <i class="fas fa-exclamation-triangle"></i> DITOLAK: WAJIB UPLOAD ULANG
+                                        </span>
                                     @endif
                                     <input type="file" name="{{ $key }}" class="form-control-file" {{ $key === 'file_template_diisi' ? 'accept=".pdf,.doc,.docx,.xls,.xlsx,.zip"' : 'accept=".pdf,.jpg,.jpeg,.png"' }}>
                                     @if($key === 'file_template_diisi')

@@ -146,11 +146,11 @@
 
                 <!-- LAINNYA -->
                 <li class="sidebar-title">Lainnya</li>
-
-                <li class="sidebar-item">
-                    <a href="/" class="sidebar-link">
-                        <i class="bi bi-eye-fill"></i>
-                        <span>Halaman Publik</span>
+                
+                <li class="sidebar-item {{ Request::is('admin/profile*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.profile') }}" class="sidebar-link">
+                        <i class="bi bi-person-badge-fill"></i>
+                        <span>Profil Saya</span>
                     </a>
                 </li>
 
