@@ -592,7 +592,7 @@
       if(strength === 2) { color = '#f59e0b'; text = 'Sedang'; }
       if(strength >= 3) { color = '#10b981'; text = 'Kuat'; }
       
-      strengthDiv.innerHTML = `<span style="color: ${color}; font-weight: 600;">Kekuatan sandi: ${text}</span> <br><span style="color: var(--text-muted);">(Min. 8 karakter, huruf besar & kecil, angka, simbol)</span>`;
+      strengthDiv.innerHTML = `<span style="color: ${color}; font-weight: 600;">Kekuatan sandi: ${text}</span> <br><span style="color: var(--text-muted);">(Min. 8 karakter)</span>`;
     });
   }
 </script>

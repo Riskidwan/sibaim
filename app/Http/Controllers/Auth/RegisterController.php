@@ -150,10 +150,6 @@ class RegisterController extends Controller implements HasMiddleware
                 'min:8', 
                 'confirmed',
                 \Illuminate\Validation\Rules\Password::min(8)
-                    ->letters()
-                    ->mixedCase()
-                    ->numbers()
-                    ->symbols()
             ],
         ])->after(function($validator) use ($data) {
             if (session('registration_email_verified') !== $data['email']) {
