@@ -465,6 +465,7 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
             'X-CSRF-TOKEN': '{{ csrf_token() }}'
           },
           body: JSON.stringify({ email: email })
@@ -491,7 +492,8 @@
           btnSendOtp.innerText = 'Verifikasi';
         }
       } catch (error) {
-        alert('Terjadi kesalahan koneksi.');
+        console.error('Error sending OTP:', error);
+        alert('Terjadi kesalahan koneksi. Silakan cek console browser (F12) untuk detail.');
         btnSendOtp.disabled = false;
         btnSendOtp.innerText = 'Verifikasi';
       }
@@ -513,6 +515,7 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
             'X-CSRF-TOKEN': '{{ csrf_token() }}'
           },
           body: JSON.stringify({ email: email, otp: otp })
@@ -550,7 +553,8 @@
           btnCheckOtp.innerText = 'Cek Kode';
         }
       } catch (error) {
-        alert('Terjadi kesalahan koneksi.');
+        console.error('Error verifying OTP:', error);
+        alert('Terjadi kesalahan koneksi. Silakan cek console browser (F12) untuk detail.');
         btnCheckOtp.disabled = false;
         btnCheckOtp.innerText = 'Cek Kode';
       }
