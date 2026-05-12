@@ -296,7 +296,9 @@
         <div class="input-group">
           <label>ALAMAT EMAIL</label>
           <input type="email" name="email" value="{{ old('email') }}" placeholder="admin@gmail.com" required autofocus/>
-          @error('email')<span style="color:#e11d48;font-size:12px;margin-top:4px;display:block">{{ $message }}</span>@enderror
+          @if(!$errors->hasBag('registerBag'))
+            @error('email')<span style="color:#e11d48;font-size:12px;margin-top:4px;display:block">{{ $message }}</span>@enderror
+          @endif
         </div>
 
         <div class="input-group">
@@ -329,13 +331,31 @@
       <div class="form-title">Buat Akun Baru</div>
       <div class="form-subtitle">Daftarkan akun untuk mengajukan PSU Anda</div>
 
+      <!-- Step Indicator -->
+      <div id="reg-step-indicator" style="display:flex;gap:6px;align-items:center;margin-bottom:18px;">
+        <div id="step-1" style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--blue-main)">
+          <span style="width:20px;height:20px;border-radius:50%;background:var(--blue-main);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;">1</span>
+          Masukkan Email
+        </div>
+        <span style="flex:1;height:1px;background:#dce5f7;"></span>
+        <div id="step-2" style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#94a3b8">
+          <span id="step-2-circle" style="width:20px;height:20px;border-radius:50%;background:#e2e8f0;color:#94a3b8;display:inline-flex;align-items:center;justify-content:center;font-size:10px;">2</span>
+          Verifikasi OTP
+        </div>
+        <span style="flex:1;height:1px;background:#dce5f7;"></span>
+        <div id="step-3" style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#94a3b8">
+          <span id="step-3-circle" style="width:20px;height:20px;border-radius:50%;background:#e2e8f0;color:#94a3b8;display:inline-flex;align-items:center;justify-content:center;font-size:10px;">3</span>
+          Lengkapi Data
+        </div>
+      </div>
+
       <form method="POST" action="{{ route('register') }}">
         @csrf
 
         <div class="input-group">
           <label>Nama Lengkap</label>
           <input type="text" name="name" value="{{ old('name') }}" placeholder="Nama lengkap Anda" required/>
-          @error('name')<span style="color:#e11d48;font-size:12px;margin-top:4px;display:block">{{ $message }}</span>@enderror
+          @error('name', 'registerBag')<span style="color:#e11d48;font-size:12px;margin-top:4px;display:block">{{ $message }}</span>@enderror
         </div>
 
         <div class="input-group">
@@ -347,13 +367,13 @@
             <button type="button" id="btn-send-otp" class="btn-inline-verify">Verifikasi</button>
           </div>
           <div id="verify-email-status" class="verify-status"></div>
-          @error('email')<span style="color:#e11d48;font-size:12px;margin-top:4px;display:block">{{ $message }}</span>@enderror
+          @error('email', 'registerBag')<span style="color:#e11d48;font-size:12px;margin-top:4px;display:block">{{ $message }}</span>@enderror
         </div>
 
         <!-- OTP SECTION (HIDDEN BY DEFAULT) -->
         <div id="otp-section">
-          <label>Masukan Kode OTP</label>
-          <p style="font-size: 11px; color: #64748b; margin-bottom: 10px;">Kode telah dikirim ke email Anda. Periksa kotak masuk/spam.</p>
+          <label>② Masukkan Kode OTP</label>
+          <p style="font-size: 11px; color: #64748b; margin-bottom: 10px;">Kode 6 digit telah dikirim ke email Anda. Periksa kotak masuk atau folder Spam.</p>
           <div style="display: flex; gap: 8px;">
             <input type="text" id="reg-otp" maxlength="6" placeholder="000000" style="text-align: center; font-weight: 800; letter-spacing: 4px;"/>
             <button type="button" id="btn-check-otp" class="btn-inline-verify">Cek Kode</button>
@@ -368,7 +388,8 @@
               <input type="password" name="password" id="reg-password" placeholder="Min. 8 karakter" required/>
               <i class="fas fa-eye toggle-password" onclick="togglePassword('reg-password', this)"></i>
             </div>
-            @error('password')<span style="color:#e11d48;font-size:12px;margin-top:4px;display:block">{{ $message }}</span>@enderror
+            <div id="password-strength" style="font-size: 11px; margin-top: 4px; display: none;"></div>
+            @error('password', 'registerBag')<span style="color:#e11d48;font-size:12px;margin-top:4px;display:block">{{ $message }}</span>@enderror
           </div>
           <div class="input-group">
             <label>Konfirmasi Sandi</label>
@@ -380,9 +401,12 @@
         </div>
 
         <button type="submit" id="btn-register-submit" class="btn-submit" style="margin-top:6px;" disabled>Daftarkan Akun</button>
+        <p id="reg-submit-hint" style="text-align:center;font-size:11px;color:#94a3b8;margin-top:8px;transition:opacity 0.3s;">
+          🔒 Verifikasi email Anda terlebih dahulu untuk mengaktifkan tombol ini
+        </p>
       </form>
-      <p class="terms" style="margin-top: 15px; font-size: 11px; color: var(--text-muted); text-align: center;">
-        Dengan mendaftar, Anda menyetujui Syarat & Ketentuan serta Kebijakan Privasi sistem.
+      <p class="terms" style="margin-top: 10px; font-size: 11px; color: var(--text-muted); text-align: center;">
+        Dengan mendaftar, Anda menyetujui Syarat &amp; Ketentuan serta Kebijakan Privasi sistem.
       </p>
     </div>
 
@@ -394,10 +418,11 @@
 </div>
 
 <script>
-  // Baca URL param ?tab=register untuk auto-switch ke tab Daftar (dari link redirect)
+  // Baca URL param ?tab=register atau jika ada error dari form registrasi
   (function() {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('tab') === 'register') switchTab('register');
+    const hasRegisterErrors = {{ $errors->hasBag('registerBag') ? 'true' : 'false' }};
+    if (params.get('tab') === 'register' || hasRegisterErrors) switchTab('register');
   })();
 
   function switchTab(tab) {
@@ -448,11 +473,16 @@
         const data = await response.json();
         if(data.success) {
           otpSection.style.display = 'block';
-          emailStatus.innerText = 'Kode OTP terkirim!';
+          emailStatus.innerText = '✓ Kode OTP terkirim! Cek inbox/spam email Anda.';
           emailStatus.className = 'verify-status success';
           emailStatus.style.display = 'block';
           btnSendOtp.innerText = 'Kirim Ulang';
           btnSendOtp.disabled = false;
+          // Advance step indicator to step 2
+          const s2 = document.getElementById('step-2');
+          const s2c = document.getElementById('step-2-circle');
+          if(s2) s2.style.color = 'var(--blue-main)';
+          if(s2c) { s2c.style.background = 'var(--blue-main)'; s2c.style.color = '#fff'; }
         } else {
           emailStatus.innerText = data.message || 'Gagal mengirim OTP.';
           emailStatus.className = 'verify-status error';
@@ -476,7 +506,7 @@
       }
 
       btnCheckOtp.disabled = true;
-      btnCheckOtp.innerText = 'Checking...';
+      btnCheckOtp.innerText = 'Memeriksa...';
 
       try {
         const response = await fetch('{{ route("auth.verify-otp-registration") }}', {
@@ -504,6 +534,14 @@
           // Enable register button
           submitBtn.disabled = false;
           isEmailVerified = true;
+          // Advance step indicator to step 3
+          const s3 = document.getElementById('step-3');
+          const s3c = document.getElementById('step-3-circle');
+          if(s3) s3.style.color = 'var(--blue-main)';
+          if(s3c) { s3c.style.background = 'var(--blue-main)'; s3c.style.color = '#fff'; }
+          // Hide submit hint
+          const hint = document.getElementById('reg-submit-hint');
+          if(hint) hint.style.display = 'none';
         } else {
           otpStatus.innerText = data.message || 'Kode OTP salah.';
           otpStatus.className = 'verify-status error';
@@ -530,6 +568,28 @@
       icon.classList.remove("fa-eye-slash");
       icon.classList.add("fa-eye");
     }
+  }
+
+  // Password Strength Indicator
+  const pwInput = document.getElementById('reg-password');
+  const strengthDiv = document.getElementById('password-strength');
+  if(pwInput && strengthDiv) {
+    pwInput.addEventListener('input', function() {
+      const val = pwInput.value;
+      if(!val) { strengthDiv.style.display = 'none'; return; }
+      strengthDiv.style.display = 'block';
+      let strength = 0;
+      if(val.length >= 8) strength++;
+      if(/[a-z]/.test(val) && /[A-Z]/.test(val)) strength++;
+      if(/\d/.test(val)) strength++;
+      if(/[^a-zA-Z\d]/.test(val)) strength++;
+      
+      let color = '#ef4444'; let text = 'Lemah';
+      if(strength === 2) { color = '#f59e0b'; text = 'Sedang'; }
+      if(strength >= 3) { color = '#10b981'; text = 'Kuat'; }
+      
+      strengthDiv.innerHTML = `<span style="color: ${color}; font-weight: 600;">Kekuatan sandi: ${text}</span> <br><span style="color: var(--text-muted);">(Min. 8 karakter, huruf besar & kecil, angka, simbol)</span>`;
+    });
   }
 </script>
 

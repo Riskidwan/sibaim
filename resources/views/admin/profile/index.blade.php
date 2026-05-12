@@ -76,7 +76,15 @@
                     @csrf
                     @method('PUT')
                     <div class="form-group mb-3">
-                        <label class="form-label">Kata Sandi Baru</label>
+                        <label class="form-label">Kata Sandi Saat Ini <span class="text-danger">*</span></label>
+                        <div class="password-wrapper">
+                            <input type="password" name="current_password" id="current_password" class="form-control @error('current_password') is-invalid @enderror" required placeholder="Masukkan kata sandi saat ini">
+                            <i class="fas fa-eye toggle-password" onclick="togglePassword('current_password', this)"></i>
+                        </div>
+                        @error('current_password') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Kata Sandi Baru <span class="text-danger">*</span></label>
                         <div class="password-wrapper">
                             <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror" required placeholder="Minimal 8 karakter">
                             <i class="fas fa-eye toggle-password" onclick="togglePassword('password', this)"></i>
@@ -84,11 +92,14 @@
                         @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                     <div class="form-group mb-3">
-                        <label class="form-label">Konfirmasi Kata Sandi</label>
+                        <label class="form-label">Konfirmasi Kata Sandi Baru <span class="text-danger">*</span></label>
                         <div class="password-wrapper">
-                            <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" required placeholder="Ulangi kata sandi">
+                            <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" required placeholder="Ulangi kata sandi baru">
                             <i class="fas fa-eye toggle-password" onclick="togglePassword('password_confirmation', this)"></i>
                         </div>
+                    </div>
+                    <div class="alert alert-info small mb-3">
+                        <i class="fas fa-info-circle me-1"></i> Setelah menyimpan, kode OTP akan dikirim ke email Anda untuk konfirmasi perubahan.
                     </div>
                     <div class="d-flex justify-content-end">
                         <button type="submit" class="btn btn-danger">Perbarui Kata Sandi</button>

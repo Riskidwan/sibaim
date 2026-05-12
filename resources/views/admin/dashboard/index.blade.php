@@ -12,6 +12,26 @@
 
 @section('content')
 
+<style>
+    /* Dashboard-specific Icon Circle Pulse on Hover */
+    .stat-card:hover .icon-circle {
+        transform: scale(1.1);
+    }
+    
+    .icon-circle {
+        transition: transform 0.3s ease;
+    }
+
+    /* Force dark text for warning alert in all themes to maintain contrast */
+    .banner-warning {
+        background: linear-gradient(135deg, #fff3cd, #ffeeba) !important;
+        color: #856404 !important;
+    }
+    .banner-warning strong, .banner-warning i {
+        color: #664d03 !important;
+    }
+</style>
+
 {{-- WELCOME BANNER --}}
 <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
     <div>
@@ -29,9 +49,9 @@
 <div class="row g-3 mb-4">
     {{-- Total Permohonan PSU --}}
     <div class="col-lg-3 col-md-6">
-        <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #4361ee !important;">
+        <div class="card border-0 shadow-sm h-100 stat-card" style="border-left: 4px solid #4361ee !important;">
             <div class="card-body d-flex align-items-center gap-3 p-4">
-                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 icon-circle"
                      style="width:52px;height:52px;background:rgba(67,97,238,0.12);">
                     <i class="bi bi-folder2-open fs-4 text-primary"></i>
                 </div>
@@ -45,9 +65,9 @@
 
     {{-- Menunggu Verifikasi --}}
     <div class="col-lg-3 col-md-6">
-        <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #f77f00 !important;">
+        <div class="card border-0 shadow-sm h-100 stat-card" style="border-left: 4px solid #f77f00 !important;">
             <div class="card-body d-flex align-items-center gap-3 p-4">
-                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 icon-circle"
                      style="width:52px;height:52px;background:rgba(247,127,0,0.12);">
                     <i class="bi bi-hourglass-split fs-4" style="color:#f77f00;"></i>
                 </div>
@@ -61,9 +81,9 @@
 
     {{-- Total Perumahan --}}
     <div class="col-lg-3 col-md-6">
-        <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #2dc653 !important;">
+        <div class="card border-0 shadow-sm h-100 stat-card" style="border-left: 4px solid #2dc653 !important;">
             <div class="card-body d-flex align-items-center gap-3 p-4">
-                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 icon-circle"
                      style="width:52px;height:52px;background:rgba(45,198,83,0.12);">
                     <i class="bi bi-houses-fill fs-4 text-success"></i>
                 </div>
@@ -77,9 +97,9 @@
 
     {{-- Total Data Jalan --}}
     <div class="col-lg-3 col-md-6">
-        <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #e5383b !important;">
+        <div class="card border-0 shadow-sm h-100 stat-card" style="border-left: 4px solid #e5383b !important;">
             <div class="card-body d-flex align-items-center gap-3 p-4">
-                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 icon-circle"
                      style="width:52px;height:52px;background:rgba(229,56,59,0.12);">
                     <i class="bi bi-signpost-split-fill fs-4 text-danger"></i>
                 </div>
@@ -94,13 +114,13 @@
 
 {{-- QUICK ACTION BANNER --}}
 @if($psuPendingCount > 0)
-<div class="alert d-flex align-items-center gap-3 border-0 mb-4 px-4 py-3 rounded-3 shadow-sm"
-     style="background: linear-gradient(135deg, #fff3cd, #ffeeba); border-left: 5px solid #f77f00 !important;">
-    <i class="bi bi-exclamation-triangle-fill fs-5" style="color:#f77f00;"></i>
+<div class="alert d-flex align-items-center gap-3 border-0 mb-4 px-4 py-3 rounded-3 shadow-sm banner-warning"
+     style="border-left: 5px solid #f77f00 !important;">
+    <i class="bi bi-exclamation-triangle-fill fs-5"></i>
     <div class="flex-grow-1">
         <strong>{{ $psuPendingCount }} permohonan</strong> sedang menunggu verifikasi dokumen.
     </div>
-    <a href="{{ route('admin.psu-submissions.index') }}" class="btn btn-sm btn-warning fw-semibold text-dark text-nowrap">
+    <a href="{{ route('admin.psu-submissions.index') }}" class="btn btn-sm btn-warning fw-semibold text-dark text-nowrap shadow-sm">
         <i class="bi bi-arrow-right-circle me-1"></i> Periksa Sekarang
     </a>
 </div>

@@ -52,7 +52,11 @@ class RegisterController extends Controller implements HasMiddleware
         }
 
         $otp = sprintf("%06d", mt_rand(1, 999999));
-        session(['registration_otp' => $otp, 'registration_email' => $request->email]);
+        session([
+            'registration_otp' => $otp, 
+            'registration_email' => $request->email,
+            'registration_otp_expires_at' => Carbon::now()->addMinutes(10)
+        ]);
 
         try {
             \Illuminate\Support\Facades\Log::info('Sending OTP to: ' . $request->email . ' | OTP: ' . $otp);
@@ -68,6 +72,11 @@ class RegisterController extends Controller implements HasMiddleware
     {
         $otp = $request->otp;
         $email = $request->email;
+        $expiresAt = session('registration_otp_expires_at');
+
+        if (!$expiresAt || Carbon::now()->gt($expiresAt)) {
+            return response()->json(['success' => false, 'message' => 'Kode OTP sudah kadaluarsa. Silakan kirim ulang.']);
+        }
 
         if ($otp === session('registration_otp') && $email === session('registration_email')) {
             session(['registration_email_verified' => $email]);
@@ -105,6 +114,27 @@ class RegisterController extends Controller implements HasMiddleware
     }
 
     /**
+     * Override register to send validation errors to a named bag so they
+     * don't bleed into the login form which shares the same view.
+     */
+    public function register(Request $request)
+    {
+        $validator = $this->validator($request->all());
+
+        if ($validator->fails()) {
+            return redirect('/login?tab=register')
+                ->withErrors($validator, 'registerBag')
+                ->withInput();
+        }
+
+        $user = $this->create($request->all());
+        event(new \Illuminate\Auth\Events\Registered($user));
+        $this->guard()->login($user);
+
+        return $this->registered($request, $user) ?: redirect($this->redirectPath());
+    }
+
+    /**
      * Get a validator for an incoming registration request.
      *
      * @return \Illuminate\Contracts\Validation\Validator
@@ -125,7 +155,11 @@ class RegisterController extends Controller implements HasMiddleware
                     ->numbers()
                     ->symbols()
             ],
-        ]);
+        ])->after(function($validator) use ($data) {
+            if (session('registration_email_verified') !== $data['email']) {
+                $validator->errors()->add('email', 'Email belum diverifikasi via OTP. Silakan klik tombol Verifikasi terlebih dahulu.');
+            }
+        });
     }
 
     /**

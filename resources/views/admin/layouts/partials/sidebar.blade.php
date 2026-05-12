@@ -15,7 +15,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="theme-toggle d-flex gap-2  align-items-center mt-2">
+                <div class="theme-toggle d-flex gap-2 align-items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true"
                         role="img" class="iconify iconify--system-uicons" width="20" height="20"
                         preserveAspectRatio="xMidYMid meet" viewBox="0 0 21 21">
@@ -43,11 +43,12 @@
                         </path>
                     </svg>
                 </div>
-                <div class="sidebar-toggler  x">
-                    <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                <div class="sidebar-toggler x d-xl-none">
+                    <a href="#" class="sidebar-hide d-block"><i class="bi bi-x bi-middle"></i></a>
                 </div>
             </div>
         </div>
+
         <div class="sidebar-menu">
             <ul class="menu">
 
@@ -144,29 +145,9 @@
                     </li>
                 @endif
 
-                <!-- LAINNYA -->
-                <li class="sidebar-title">Lainnya</li>
-                
-                <li class="sidebar-item {{ Request::is('admin/profile*') ? 'active' : '' }}">
-                    <a href="{{ route('admin.profile') }}" class="sidebar-link">
-                        <i class="bi bi-person-badge-fill"></i>
-                        <span>Profil Saya</span>
-                    </a>
-                </li>
 
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link"
-                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        <i class="bi bi-box-arrow-right"></i>
-                        <span>Keluar</span>
-                    </a>
 
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                        @csrf
-                    </form>
-                </li>
 
             </ul>
-        </div>
     </div>
 </div>

@@ -26,6 +26,10 @@ class PsuHousingController extends Controller
             });
         }
 
+        if ($request->filled('status')) {
+            $query->where('status_serah_terima', $request->status);
+        }
+
         $housings = $query->latest()->paginate(10);
         return view('admin.psu_housing.index', compact('housings'));
     }

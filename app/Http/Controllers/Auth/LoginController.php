@@ -69,6 +69,21 @@ class LoginController extends Controller implements HasMiddleware
     }
 
     /**
+     * Get the failed login response instance.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function sendFailedLoginResponse(\Illuminate\Http\Request $request)
+    {
+        throw \Illuminate\Validation\ValidationException::withMessages([
+            $this->username() => ['Email atau kata sandi yang Anda masukkan salah.'],
+        ]);
+    }
+
+    /**
      * Create a new controller instance.
      *
      * @return void

@@ -1,2 +1,0 @@
-Email	admin@sigjalan.com
-Password	admin123

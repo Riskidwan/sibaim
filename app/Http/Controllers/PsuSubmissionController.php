@@ -39,30 +39,10 @@ class PsuSubmissionController extends Controller
             'max' => 'Ukuran file :attribute terlalu besar (Maks 5MB-10MB).',
         ]);
 
-        // Generate Unique Registration Number (Hardened)
+        // Generate Unique Registration Number (Hardened) and Create Submission with DB Lock
         $date = Carbon::now()->format('dmY');
-        $lastSubmission = PsuSubmission::latest('id')->first();
-        $lastSequence = 0;
         
-        if ($lastSubmission && preg_match('/-(\d+)$/', $lastSubmission->no_registrasi, $matches)) {
-            $lastSequence = (int) $matches[1];
-        }
-
-        $nextSequence = $lastSequence + 1;
-        $noRegistrasi = "";
-        
-        // Loop to prevent collision
-        do {
-            $sequenceStr = str_pad($nextSequence, 3, '0', STR_PAD_LEFT);
-            $noRegistrasi = "s-psu-{$date}-{$sequenceStr}";
-            $exists = PsuSubmission::where('no_registrasi', $noRegistrasi)->exists();
-            if ($exists) {
-                $nextSequence++;
-            }
-        } while ($exists);
-
         $data = $request->only(['nama_pemohon', 'lokasi_pembangunan']);
-        $data['no_registrasi'] = $noRegistrasi;
         $data['user_id'] = \Illuminate\Support\Facades\Auth::id();
 
         // Handle File Uploads
@@ -73,7 +53,35 @@ class PsuSubmissionController extends Controller
                 $data[$fileKey] = $path;
             }
         }
-        $submission = PsuSubmission::create($data);
+
+        $noRegistrasi = \Illuminate\Support\Facades\DB::transaction(function () use ($date, &$data) {
+            $lastSubmission = PsuSubmission::lockForUpdate()->latest('id')->first();
+            $lastSequence = 0;
+            
+            if ($lastSubmission && preg_match('/-(\d+)$/', $lastSubmission->no_registrasi, $matches)) {
+                $lastSequence = (int) $matches[1];
+            }
+
+            $nextSequence = $lastSequence + 1;
+            $noReg = "";
+            
+            // Loop to prevent collision
+            do {
+                $sequenceStr = str_pad($nextSequence, 3, '0', STR_PAD_LEFT);
+                $noReg = "s-psu-{$date}-{$sequenceStr}";
+                $exists = PsuSubmission::where('no_registrasi', $noReg)->exists();
+                if ($exists) {
+                    $nextSequence++;
+                }
+            } while ($exists);
+
+            $data['no_registrasi'] = $noReg;
+            PsuSubmission::create($data);
+            
+            return $noReg;
+        });
+
+        $submission = PsuSubmission::where('no_registrasi', $noRegistrasi)->first();
 
         // Auto-sync: Create PsuHousing record with status 'Belum Serah Terima'
         \App\Models\PsuHousing::firstOrCreate(

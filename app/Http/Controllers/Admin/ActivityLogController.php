@@ -19,4 +19,15 @@ class ActivityLogController extends Controller
 
         return view('admin.activity_log.index', compact('activities'));
     }
+
+    /**
+     * Clear all logs.
+     */
+    public function clear()
+    {
+        ActivityLog::query()->delete();
+        
+        return redirect()->route('admin.activity-log.index')
+            ->with('success', 'Semua riwayat aktivitas sistem telah berhasil dibersihkan.');
+    }
 }

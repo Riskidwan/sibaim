@@ -88,6 +88,7 @@ Route::middleware(['auth', 'role:superadmin,kepala', 'verified.custom'])->prefix
     Route::middleware(['role:superadmin'])->group(function () {
         Route::resource('users', App\Http\Controllers\Admin\UserController::class)->names('admin.users');
         Route::get('activity-log', [App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('admin.activity-log.index');
+        Route::delete('activity-log/clear', [App\Http\Controllers\Admin\ActivityLogController::class, 'clear'])->name('admin.activity-log.clear');
 
         // Master Data Routes
         Route::prefix('master')->name('admin.master.')->group(function () {

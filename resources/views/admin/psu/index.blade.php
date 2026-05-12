@@ -3,9 +3,35 @@
 
 @section('content')
 <div class="card">
-    <div class="card-header">
-        <h5 class="card-title">Daftar Permohonan Serah Terima PSU</h5>
-        <p class="text-subtitle text-muted">Monitoring pengajuan Prasarana, Sarana, dan Utilitas</p>
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h5 class="card-title">Daftar Permohonan Serah Terima PSU</h5>
+            <p class="text-subtitle text-muted">Monitoring pengajuan Prasarana, Sarana, dan Utilitas</p>
+        </div>
+        <div class="d-flex align-items-center">
+            <form action="{{ route('admin.psu-submissions.index') }}" method="GET" class="d-flex align-items-center gap-2">
+                <label for="status" class="text-muted small text-nowrap mb-0">Filter Status:</label>
+                <select name="status" id="status" class="form-select form-select-sm" onchange="this.form.submit()" style="min-width: 200px;">
+                    <option value="">-- Semua Status --</option>
+                    @php
+                        $availableStatuses = [
+                            'verifikasi dokumen' => 'Verifikasi Dokumen',
+                            'perbaikan dokumen' => 'Perbaikan Dokumen',
+                            'penugasan tim verifikasi' => 'Penugasan Tim Verifikasi',
+                            'BA terima terbit' => 'BA Terima Terbit'
+                        ];
+                    @endphp
+                    @foreach($availableStatuses as $val => $label)
+                        <option value="{{ $val }}" {{ request('status') == $val ? 'selected' : '' }}>{{ $label }}</option>
+                    @endforeach
+                </select>
+                @if(request('status'))
+                    <a href="{{ route('admin.psu-submissions.index') }}" class="btn btn-sm btn-light-secondary" title="Reset Filter">
+                        <i class="bi bi-x-circle"></i>
+                    </a>
+                @endif
+            </form>
+        </div>
     </div>
     <div class="card-body">
         <div class="table-responsive">
@@ -24,7 +50,7 @@
                     @forelse ($submissions as $index => $sub)
                         <tr>
                             <td>{{ $index + 1 }}</td>
-                            <td class="text-bold-500">{{ $sub->no_registrasi }}</td>
+                            <td class="text-bold-500 text-uppercase">{{ $sub->no_registrasi }}</td>
                             <td>{{ $sub->nama_pemohon }}</td>
                             <td>
                                 <span class="text-muted small">
@@ -41,7 +67,7 @@
                                     if($sub->status === 'terima') $badgeColor = 'bg-success';
                                     if($sub->status === 'tolak') $badgeColor = 'bg-danger';
                                 @endphp
-                                <span class="badge {{ $badgeColor }}">{{ $sub->status }}</span>
+                                <span class="badge {{ $badgeColor }} text-capitalize">{{ $sub->status }}</span>
                             </td>
                             <td class="text-center">
                                 <div class="d-flex gap-2 justify-content-center">

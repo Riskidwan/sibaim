@@ -30,7 +30,7 @@
                 </div>
 
                 <div class="col-md-12 mb-3">
-                    <label for="description" class="form-label">Deskripsi</label>
+                    <label for="description" class="form-label">Deskripsi (Opsional)</label>
                     <textarea id="description" name="description" class="form-control @error('description') is-invalid @enderror" rows="3" placeholder="Masukkan deskripsi file">{{ old('description') }}</textarea>
                     @error('description') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>

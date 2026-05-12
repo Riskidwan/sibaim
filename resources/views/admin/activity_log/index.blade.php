@@ -1,13 +1,24 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Log Aktivitas Sistem')
+@section('title',   'Log Aktivitas Sistem')
 
 @section('content')
 <section class="section">
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h4 class="card-title">Seluruh Riwayat Aktivitas</h4>
-            <span class="badge bg-primary">{{ $activities->total() }} Total Kegiatan</span>
+            <div class="d-flex align-items-center gap-3">
+                <span class="badge bg-primary">{{ $activities->total() }} Total Kegiatan</span>
+                @if($activities->total() > 0)
+                    <form action="{{ route('admin.activity-log.clear') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus SEMUA riwayat aktivitas? Tindakan ini tidak dapat dibatalkan.')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-trash-fill me-1"></i> Bersihkan Log
+                        </button>
+                    </form>
+                @endif
+            </div>
         </div>
         <div class="card-body">
             <div class="table-responsive">

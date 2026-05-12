@@ -307,7 +307,11 @@
                             @endif
                         </td>
                         <td>
-                            <div class="d-flex justify-content-center">
+                            <div class="d-flex justify-content-center gap-2">
+                                <button type="button" class="btn-table-action" title="Lihat Detail" data-bs-toggle="modal" data-bs-target="#detailModal{{ $sub->id }}">
+                                    <i class="fas fa-eye text-primary"></i>
+                                </button>
+                                
                                 @if($sub->status === 'perbaikan dokumen')
                                     <a href="/permohonan-psu/{{ $sub->no_registrasi }}/edit" class="btn-table-action" title="Perbaiki Dokumen">
                                         <i class="fas fa-edit text-danger"></i>
@@ -321,6 +325,76 @@
                                         <i class="fas fa-lock"></i>
                                     </div>
                                 @endif
+                            </div>
+
+                            <!-- Modal Detail -->
+                            <div class="modal fade" id="detailModal{{ $sub->id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content" style="border-radius: 16px; border: none; text-align: left;">
+                                        <div class="modal-header border-0 pb-0 mt-2 mx-2">
+                                            <h5 class="modal-title fw-bold">Detail Permohonan <span class="text-primary">{{ $sub->no_registrasi }}</span></h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body pt-3 px-4">
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <div class="p-3 bg-light rounded-3">
+                                                        <small class="text-muted d-block mb-1">Nama Pemohon</small>
+                                                        <div class="fw-semibold">{{ $sub->nama_pemohon }}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="p-3 bg-light rounded-3">
+                                                        <small class="text-muted d-block mb-1">Status</small>
+                                                        <div class="fw-semibold text-primary">{{ ucwords($sub->status) }}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="p-3 bg-light rounded-3">
+                                                        <small class="text-muted d-block mb-1">Lokasi Pembangunan</small>
+                                                        <div class="fw-semibold">{{ $sub->lokasi_pembangunan }}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <h6 class="fw-bold mt-4 mb-3">Dokumen Tersimpan</h6>
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered table-sm">
+                                                    <tbody>
+                                                        @php
+                                                            $docs = [
+                                                                'FC KTP' => 'fc_ktp',
+                                                                'FC Akta Pendirian' => 'fc_akta_pendirian',
+                                                                'FC Sertifikat Tanah' => 'fc_sertifikat_tanah',
+                                                                'Siteplan' => 'siteplan',
+                                                                'Daftar PSU & Nilai' => 'daftar_psu_nilai',
+                                                                'FC IMB / PBG' => 'fc_imb_pbg',
+                                                                'Template Diisi' => 'file_template_diisi'
+                                                            ];
+                                                        @endphp
+                                                        @foreach($docs as $label => $field)
+                                                        <tr>
+                                                            <td style="width: 60%;" class="align-middle">{{ $label }}</td>
+                                                            <td class="text-center">
+                                                                @if($sub->$field)
+                                                                    <a href="{{ route('psu.file.serve', ['submission' => $sub->id, 'field' => $field]) }}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                                                        <i class="fas fa-eye me-1"></i> Lihat
+                                                                    </a>
+                                                                @else
+                                                                    <span class="badge bg-secondary">Tidak ada</span>
+                                                                @endif
+                                                            </td>
+                                                        </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer border-0">
+                                            <button type="button" class="btn btn-light rounded-pill px-4 mb-2" data-bs-dismiss="modal">Tutup</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </td>
                     </tr>

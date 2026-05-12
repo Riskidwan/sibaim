@@ -22,8 +22,144 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
     <style>
+        /* Theme Variable Definitions */
+        :root {
+            --main-bg: #f2f7ff;
+        }
+        
+        /* Dark Theme Variable Overrides */
+        .theme-dark, 
+        [data-bs-theme="dark"] {
+            --main-bg: #0f111a;
+        }
+
+        /* Layout Consistency & Spacing Optimization */
+        body, #app, #main, header, .page-heading, .page-content {
+            transition: background-color 0.3s ease;
+            background-color: var(--main-bg) !important;
+        }
+
+        #main {
+            padding: 0 !important;
+            min-height: 100vh;
+        }
+        
+        #main header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0.7rem 2rem !important;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem !important;
+            box-shadow: 0 1px 10px rgba(0,0,0,0.02);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            transition: all 0.3s ease;
+        }
+        .theme-dark #main header {
+            background: rgba(15, 17, 26, 0.95) !important;
+            border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important;
+        }
+
+        #main header .user-name h6 {
+            color: #444;
+            transition: color 0.3s ease;
+        }
+        .theme-dark #main header .user-name h6 {
+            color: #efefef;
+        }
+        #main header .user-name p {
+            color: #777;
+        }
+        .theme-dark #main header .user-name p {
+            color: #999;
+        }
+        #main header .burger-btn i {
+            color: #435ebe;
+        }
+        .theme-dark #main header .burger-btn i {
+            color: #fff;
+        }
+
+        .page-content {
+            padding: 0 2rem 2rem !important;
+        }
+        .page-heading {
+            margin-top: 0 !important;
+            margin-bottom: 1.5rem !important;
+            padding: 0 2rem !important;
+        }
+
+        /* Sidebar Spacing Optimization */
+        .sidebar-wrapper .sidebar-header {
+            padding: 1.2rem 1.5rem 0.5rem !important;
+            margin-bottom: 0 !important;
+        }
+        .sidebar-wrapper .menu {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
         .sidebar-wrapper .menu .sidebar-title {
-            padding: 1.5rem 1.5rem 0.5rem;
+            padding: 0.8rem 1.5rem 0.3rem !important;
+            font-size: 0.7rem !important;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.5rem !important;
+        }
+        .sidebar-wrapper .menu .sidebar-item .sidebar-link {
+            padding: 0.6rem 1.5rem !important;
+        }
+
+        /* Global Card Aesthetics (Theme-Aware Consistency) */
+        .card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            border: 1px solid rgba(0,0,0,0.05) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03) !important;
+        }
+        .theme-dark .card {
+            border: 1px solid rgba(255,255,255,0.08) !important;
+            background-color: #151724 !important; /* Slightly elevated card */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important;
+        }
+        .theme-dark .sidebar-wrapper {
+            background-color: #0f111a !important;
+            border-right: 1px solid rgba(255,255,255,0.05) !important;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
+        }
+        .theme-dark .card:hover {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4) !important;
+        }
+
+        /* Responsive Fixes */
+        @media (max-width: 767.98px) {
+            .page-heading {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 10px;
+                padding: 0 1.5rem !important;
+            }
+            #main header {
+                padding: 0.8rem 1.5rem !important;
+            }
+            .page-content {
+                padding: 0 1.5rem 1.5rem !important;
+            }
+        }
+
+        /* User Menu Hover Effect */
+        .user-menu {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .user-menu:hover {
+            background: rgba(0,0,0,0.03);
+        }
+        .theme-dark .user-menu:hover {
+            background: rgba(255,255,255,0.05);
         }
     </style>
 

@@ -163,7 +163,11 @@
             </div>
         </div>
     @empty
-        <p class="text-center py-5">Galeri belum tersedia.</p>
+        <div class="text-center py-5" style="margin-top: 40px; margin-bottom: 80px;">
+            <i class="far fa-images fa-4x mb-3" style="color: #cbd5e1;"></i>
+            <h4 style="color: #475569; font-weight: 700;">Galeri Belum Tersedia</h4>
+            <p style="color: #64748b; font-size: 1.1rem;">Belum ada dokumentasi kegiatan yang diunggah untuk saat ini.<br>Silakan kunjungi kembali nanti.</p>
+        </div>
     @endforelse
 </div>
 @endsection

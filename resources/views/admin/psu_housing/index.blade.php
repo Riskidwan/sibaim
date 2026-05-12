@@ -5,11 +5,18 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center">
-            <form action="{{ route('admin.psu-housing.index') }}" method="GET" class="d-flex gap-2">
+            <form action="{{ route('admin.psu-housing.index') }}" method="GET" class="d-flex gap-2 flex-wrap">
                 <div class="form-group mb-0">
                     <input type="text" name="search" class="form-control form-control-sm" placeholder="Cari perumahan..." value="{{ request('search') }}">
                 </div>
-                @if(request('search'))
+                <div class="form-group mb-0">
+                    <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <option value="">-- Semua Status --</option>
+                        <option value="Belum Serah Terima" {{ request('status') == 'Belum Serah Terima' ? 'selected' : '' }}>Belum Terima</option>
+                        <option value="Sudah Serah Terima" {{ request('status') == 'Sudah Serah Terima' ? 'selected' : '' }}>Sudah Terima</option>
+                    </select>
+                </div>
+                @if(request('search') || request('status'))
                     <a href="{{ route('admin.psu-housing.index') }}" class="btn btn-secondary btn-sm" title="Reset Filter">
                         <i class="bi bi-arrow-counterclockwise"></i>
                     </a>

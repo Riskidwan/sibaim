@@ -32,7 +32,7 @@ class PublicDownloadController extends Controller
     public function create()
     {
         $this->authorizeAdmin();
-        $categories = ['SK Jalan Lingkungan', 'SK Kawasan Kumuh', 'BA Penanganan Kumuh', 'Template PSU', 'Umum'];
+        $categories = ['Template PSU', 'Umum'];
         return view('admin.public_downloads.create', compact('categories'));
     }
 
@@ -43,7 +43,7 @@ class PublicDownloadController extends Controller
     {
         $this->authorizeAdmin();
         $request->validate([
-            'kategori' => 'required|string|in:SK Jalan Lingkungan,SK Kawasan Kumuh,BA Penanganan Kumuh,Template PSU,Umum',
+            'kategori' => 'required|string|in:Template PSU,Umum',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'tanggal' => 'nullable|date',
@@ -75,7 +75,7 @@ class PublicDownloadController extends Controller
     {
         $this->authorizeAdmin();
         $download = \App\Models\PublicDownload::findOrFail($id);
-        $categories = ['SK Jalan Lingkungan', 'SK Kawasan Kumuh', 'BA Penanganan Kumuh', 'Template PSU', 'Umum'];
+        $categories = ['Template PSU', 'Umum'];
         return view('admin.public_downloads.edit', compact('download', 'categories'));
     }
 
@@ -86,7 +86,7 @@ class PublicDownloadController extends Controller
     {
         $this->authorizeAdmin();
         $request->validate([
-            'kategori' => 'required|string|in:SK Jalan Lingkungan,SK Kawasan Kumuh,BA Penanganan Kumuh,Template PSU,Umum',
+            'kategori' => 'required|string|in:Template PSU,Umum',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'tanggal' => 'nullable|date',

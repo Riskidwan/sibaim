@@ -12,6 +12,20 @@
     </div>
 
     <div class="card-body">
+        @if($errors->any())
+            <div class="alert alert-danger alert-dismissible show fade">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                    <ul class="mb-0 small fw-semibold">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         <form action="{{ route('admin.psu-housing.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             
@@ -25,49 +39,49 @@
                 <div class="col-md-12">
                     <div class="form-group mb-3">
                         <label for="nama_perumahan" class="form-label fw-semibold text-muted text-uppercase small">Nama Perumahan <span class="text-danger">*</span></label>
-                        <input type="text" id="nama_perumahan" name="nama_perumahan" class="form-control" value="{{ old('nama_perumahan') }}" required placeholder="Contoh: Perumahan Puri Praja">
+                        <input type="text" id="nama_perumahan" name="nama_perumahan" class="form-control @error('nama_perumahan') is-invalid @enderror" value="{{ old('nama_perumahan') }}" required placeholder="Contoh: Perumahan Puri Praja">
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group mb-3">
                         <label for="alamat" class="form-label fw-semibold text-muted text-uppercase small">Alamat Lengkap <span class="text-danger">*</span></label>
-                        <textarea id="alamat" name="alamat" class="form-control" rows="3" required placeholder="Masukkan alamat lengkap perumahan...">{{ old('alamat') }}</textarea>
+                        <textarea id="alamat" name="alamat" class="form-control @error('alamat') is-invalid @enderror" rows="3" required placeholder="Masukkan alamat lengkap perumahan...">{{ old('alamat') }}</textarea>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group mb-3">
                         <label for="nama_pengembang" class="form-label fw-semibold text-muted text-uppercase small">Nama Pengembang <span class="text-danger">*</span></label>
-                        <input type="text" id="nama_pengembang" name="nama_pengembang" class="form-control" value="{{ old('nama_pengembang') }}" required placeholder="Masukkan nama pengembang">
+                        <input type="text" id="nama_pengembang" name="nama_pengembang" class="form-control @error('nama_pengembang') is-invalid @enderror" value="{{ old('nama_pengembang') }}" required placeholder="Masukkan nama pengembang">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group mb-3">
                         <label for="no_ba_serah_terima" class="form-label fw-semibold text-muted text-uppercase small">No. BA Serah Terima</label>
-                        <textarea id="no_ba_serah_terima" name="no_ba_serah_terima" class="form-control" rows="2" placeholder="Contoh: 600/123/2024 (Bisa input lebih dari satu)">{{ old('no_ba_serah_terima') }}</textarea>
+                        <textarea id="no_ba_serah_terima" name="no_ba_serah_terima" class="form-control @error('no_ba_serah_terima') is-invalid @enderror" rows="2" placeholder="Contoh: 600/123/2024 (Bisa input lebih dari satu)">{{ old('no_ba_serah_terima') }}</textarea>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group mb-3">
                         <label for="luas_lahan_m2" class="form-label fw-semibold text-muted text-uppercase small">Luas Lahan (m²)</label>
-                        <input type="number" id="luas_lahan_m2" name="luas_lahan_m2" class="form-control" value="{{ old('luas_lahan_m2') }}" step="0.01">
+                        <input type="number" id="luas_lahan_m2" name="luas_lahan_m2" class="form-control @error('luas_lahan_m2') is-invalid @enderror" value="{{ old('luas_lahan_m2') }}" step="0.01">
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group mb-3">
                         <label for="total_luas_psu" class="form-label fw-semibold text-muted text-uppercase small">Total Luas PSU (m²)</label>
-                        <input type="number" id="total_luas_psu" name="total_luas_psu" class="form-control" value="{{ old('total_luas_psu') }}" step="0.01">
+                        <input type="number" id="total_luas_psu" name="total_luas_psu" class="form-control @error('total_luas_psu') is-invalid @enderror" value="{{ old('total_luas_psu') }}" step="0.01">
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group mb-3">
                         <label for="jumlah_rumah" class="form-label fw-semibold text-muted text-uppercase small">Jumlah Rumah</label>
-                        <input type="number" id="jumlah_rumah" name="jumlah_rumah" class="form-control" value="{{ old('jumlah_rumah') }}">
+                        <input type="number" id="jumlah_rumah" name="jumlah_rumah" class="form-control @error('jumlah_rumah') is-invalid @enderror" value="{{ old('jumlah_rumah') }}">
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group mb-3">
                         <label for="status_serah_terima" class="form-label fw-semibold text-muted text-uppercase small">Status Serah Terima <span class="text-danger">*</span></label>
-                        <select id="status_serah_terima" name="status_serah_terima" class="form-select" required>
+                        <select id="status_serah_terima" name="status_serah_terima" class="form-select @error('status_serah_terima') is-invalid @enderror" required>
                             <option value="Belum Serah Terima" {{ old('status_serah_terima') == 'Belum Serah Terima' ? 'selected' : '' }}>Belum Serah Terima</option>
                             <option value="Sudah Serah Terima" {{ old('status_serah_terima') == 'Sudah Serah Terima' ? 'selected' : '' }}>Sudah Serah Terima</option>
                         </select>
@@ -103,27 +117,27 @@
                                         <tbody>
                                             @php 
                                                 $psuStructure = [
-                                                    'prasarana' =\u003e ['jaringan_jalan'=\u003e'Jaringan Jalan','drainase'=\u003e'Drainase','jaringan_persampahan'=\u003e'PTST'],
-                                                    'sarana' =\u003e ['peribadatan'=\u003e'Tempat Ibadah','pertamanan_rth'=\u003e'Taman/RTH','lainnya'=\u003e'Lainnya']
+                                                    'prasarana' => ['jaringan_jalan'=>'Jaringan Jalan','drainase'=>'Drainase','jaringan_persampahan'=>'PTST'],
+                                                    'sarana' => ['peribadatan'=>'Tempat Ibadah','pertamanan_rth'=>'Taman/RTH','lainnya'=>'Lainnya']
                                                 ]; 
                                             @endphp
-                                            @foreach($psuStructure as $type =\u003e $items)
-                                                @foreach($items as $key =\u003e $label)
+                                            @foreach($psuStructure as $type => $items)
+                                                @foreach($items as $key => $label)
                                                 <tr>
-                                                    <td class=\"ps-3 fw-bold small\">{{ $label }}</td>
+                                                    <td class="ps-3 fw-bold small">{{ $label }}</td>
                                                     <td>
-                                                        <select name=\"{{ $type }}[{{ $key }}][status]\" class=\"form-select form-select-sm fw-bold\">
+                                                        <select name="{{ $type }}[{{ $key }}][status]" class="form-select form-select-sm fw-bold">
                                                             @foreach($psuConditions as $cond)
-                                                                <option value=\"{{ $cond- \u003ename }}\" {{ old(\"$type.$key.status\") == $cond- \u003ename ? 'selected' : '' }}\u003e{{ strtoupper($cond- \u003ename) }}\u003c/option\u003e
+                                                                <option value="{{ $cond->name }}" {{ old("$type.$key.status") == $cond->name ? 'selected' : '' }}>{{ strtoupper($cond->name) }}</option>
                                                             @endforeach
-                                                            <option value=\"N/A\" {{ old(\"$type.$key.status\") == 'N/A' || !old(\"$type.$key.status\") ? 'selected' : '' }}\u003eN/A\u003c/option\u003e
+                                                            <option value="N/A" {{ old("$type.$key.status") == 'N/A' || !old("$type.$key.status") ? 'selected' : '' }}>N/A</option>
                                                         </select>
                                                     </td>
                                                     <td>
-                                                        <textarea name=\"{{ $type }}[{{ $key }}][ukuran]\" class=\"form-control form-control-sm\" rows=\"1\" placeholder=\"Ukuran...\"\u003e{{ old(\"$type.$key.ukuran\") }}\u003c/textarea\u003e
+                                                        <textarea name="{{ $type }}[{{ $key }}][ukuran]" class="form-control form-control-sm" rows="1" placeholder="Ukuran...">{{ old("$type.$key.ukuran") }}</textarea>
                                                     </td>
-                                                    <td class=\"pe-3\">
-                                                        <textarea name=\"{{ $type }}[{{ $key }}][keterangan]\" class=\"form-control form-control-sm\" rows=\"1\" placeholder=\"Keterangan...\"\u003e{{ old(\"$type.$key.keterangan\") }}\u003c/textarea\u003e
+                                                    <td class="pe-3">
+                                                        <textarea name="{{ $type }}[{{ $key }}][keterangan]" class="form-control form-control-sm" rows="1" placeholder="Keterangan...">{{ old("$type.$key.keterangan") }}</textarea>
                                                     </td>
                                                 </tr>
                                                 @endforeach

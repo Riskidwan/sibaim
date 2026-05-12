@@ -14,9 +14,15 @@ class PsuSubmissionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $submissions = PsuSubmission::orderBy('created_at', 'desc')->get();
+        $query = PsuSubmission::orderBy('created_at', 'desc');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $submissions = $query->get();
         return view('admin.psu.index', compact('submissions'));
     }
 

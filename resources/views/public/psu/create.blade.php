@@ -212,3 +212,54 @@
 </section>
 @endsection
 
+@push('scripts')
+<script>
+// REC-03: File Preview Feedback untuk setiap field upload
+(function() {
+    const fileFields = [
+        'fc_ktp', 'fc_akta_pendirian', 'fc_sertifikat_tanah',
+        'siteplan', 'daftar_psu_nilai', 'fc_imb_pbg', 'file_template_diisi'
+    ];
+
+    const maxSizes = {
+        'file_template_diisi': 10, // 10MB
+    };
+
+    fileFields.forEach(function(fieldName) {
+        const input = document.querySelector('input[name="' + fieldName + '"]');
+        if (!input) return;
+
+        // Create preview element
+        const preview = document.createElement('div');
+        preview.id = 'preview-' + fieldName;
+        preview.style.cssText = 'margin-top:6px;padding:8px 12px;border-radius:6px;font-size:12px;display:none;';
+        input.parentNode.insertBefore(preview, input.nextSibling.nextSibling);
+
+        input.addEventListener('change', function() {
+            if (!this.files || !this.files[0]) {
+                preview.style.display = 'none';
+                return;
+            }
+
+            const file = this.files[0];
+            const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            const maxMB = maxSizes[fieldName] || 5;
+            const isTooBig = parseFloat(sizeMB) > maxMB;
+
+            if (isTooBig) {
+                preview.style.background = '#fef2f2';
+                preview.style.border = '1px solid #fecaca';
+                preview.style.color = '#dc2626';
+                preview.innerHTML = '⚠️ <strong>' + file.name + '</strong> (' + sizeMB + ' MB) — Melebihi batas ' + maxMB + 'MB!';
+            } else {
+                preview.style.background = '#f0fdf4';
+                preview.style.border = '1px solid #bbf7d0';
+                preview.style.color = '#16a34a';
+                preview.innerHTML = '✅ <strong>' + file.name + '</strong> (' + sizeMB + ' MB) — Siap diunggah';
+            }
+            preview.style.display = 'block';
+        });
+    });
+})();
+</script>
+@endpush

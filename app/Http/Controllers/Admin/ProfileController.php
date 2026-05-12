@@ -50,14 +50,21 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         $request->validate([
+            'current_password' => ['required', 'current_password'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        $user->update([
-            'password' => Hash::make($request->password),
+        $otp = sprintf("%06d", mt_rand(1, 999999));
+        session([
+            'admin_update_type' => 'password',
+            'admin_pending_password' => Hash::make($request->password),
+            'admin_update_otp' => $otp,
+            'admin_update_otp_expires_at' => Carbon::now()->addMinutes(10),
         ]);
 
-        return back()->with('success', 'Kata sandi berhasil diperbarui.');
+        Mail::to($user->email)->send(new SendOtpMail($otp));
+
+        return redirect()->route('admin.profile.verify-otp')->with('status', 'OTP telah dikirim ke email Anda untuk konfirmasi perubahan kata sandi.');
     }
 
     public function showVerifyOtpForm()
