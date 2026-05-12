@@ -62,9 +62,9 @@ class RegisterController extends Controller implements HasMiddleware
             \Illuminate\Support\Facades\Log::info('Sending OTP to: ' . $request->email . ' | OTP: ' . $otp);
             Mail::to($request->email)->send(new SendOtpMail($otp));
             return response()->json(['success' => true]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Failed to send OTP: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Gagal mengirim email. Silakan coba lagi.']);
+            return response()->json(['success' => false, 'message' => 'SMTP Error: ' . $e->getMessage()]);
         }
     }
 
